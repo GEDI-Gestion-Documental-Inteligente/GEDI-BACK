@@ -15,7 +15,7 @@ export const getAlfrescoTicket = async (userData) => {
   const response = await fetch(`http://localhost:8080/${URL_AUTH_API}/tickets`, {
     method: "POST",
     "Content-Type": "application/json",
-    body: JSON.stringify(userData),
+    body: JSON.stringify({userId,password}),
   });
   const data = await response.json();
   return data;

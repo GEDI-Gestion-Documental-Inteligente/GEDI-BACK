@@ -10,7 +10,11 @@ export const createAlfrescoPerson = async (ticket, personData) => {
     const token = toConvertBase64(ticket);
     const { id, firstName, lastName, email, password, skypeId, jobTitle } =
       personData;
-
+      if(!id || !firstName || !lastName || !email || !password || !skypeId || !jobTitle){
+        return res.json({
+          message:"No se encuentran los credenciales necesarios."
+        })
+      }
     // Enviar la persona a Alfresco
     const response = await fetch(
       `http://localhost:8080/${URL_CORE_API}/people`,
@@ -20,7 +24,7 @@ export const createAlfrescoPerson = async (ticket, personData) => {
           "Content-Type": "application/json",
           Authorization: `Basic ${token}`,
         },
-        body: JSON.stringify(personData), // Enviar los datos de la persona a Alfresco
+        body: JSON.stringify({id, firstName, lastName, email, password, skypeId, jobTitle}), // Enviar los datos de la persona a Alfresco
       }
     );
 
