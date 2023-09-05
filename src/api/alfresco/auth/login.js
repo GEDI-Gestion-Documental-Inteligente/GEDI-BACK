@@ -7,6 +7,11 @@ const URL_AUTH_API = "alfresco/api/-default-/public/authentication/versions/1";
 // Autenticar Usuario
 export const getAlfrescoTicket = async (userData) => {
   const { userId, password } = userData;
+  if(!userId || !password){
+    return res.json({
+      message:"No se encuentran los credenciales necesarios."
+    })
+  }
   const response = await fetch(`http://localhost:8080/${URL_AUTH_API}/tickets`, {
     method: "POST",
     "Content-Type": "application/json",
