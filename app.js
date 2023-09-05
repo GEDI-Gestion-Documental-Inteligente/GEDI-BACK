@@ -31,9 +31,11 @@ app.use(cookieParser({
 // Rutas
 import AuthLogin from './src/modules/authLogin/authLogin.controllers.js';
 import People from './src/modules/people/people.controllers.js';
+import Sites from './src/modules/sites/sites.controllers.js'
 //
 app.use("/api/",AuthLogin)
 app.use("/api/people",People)
+app.use("/api/sites",Sites)
 
 // Not Found Routes
 app.use((req, res) => res.send(`<p>La ruta no válida: <strong>${req.url}</strong></p>`))
