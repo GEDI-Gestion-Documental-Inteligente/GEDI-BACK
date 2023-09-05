@@ -45,7 +45,9 @@ export const authLogin = async ({ userId, password }) => {
             };
         }
 
-        const token = await generarJwt(auth.entry.id, process.env.SECRET);
+        const authTicket = auth.entry
+
+        const token = await generarJwt(authTicket, process.env.SECRET);
         return {
             ok: true,
             msg: "Autenticado correctamente.",

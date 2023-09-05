@@ -67,6 +67,36 @@ export const getAlfrescoPeople = async ({ ticket }) => {
     }
 };
 
+
+const getAlfrescoPeopleActivities = async({ticket, userId})=>{
+
+    try {
+        const URL_CORE_API = process.env.URL_CORE_API;
+        const URL_HOST = process.env.URL_HOST;
+
+        const token = toConvertBase64(ticket)
+
+        const response = await fetch(
+            `http://${URL_HOST}:8080/${URL_CORE_API}/people/${userId}/activities`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Basic ${token}`,
+                },
+            }
+        );
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.log(error)
+        
+    }
+
+
+}
+
 export const getPeople = async ({ ticket }) => {
     try {
         const people = await getAlfrescoPeople({ ticket });
@@ -152,3 +182,40 @@ export const createPerson = async ({ ticket, personData }) => {
         };
     }
 };
+
+
+export const getPeopleActivities = async ({ticket, userId})=>{
+    try {
+        if(!userId){
+            return({
+                ok: false,
+                msg: "Faltan datos requeridos"
+            })
+        }
+
+        const peopleActivities = await getAlfrescoPeopleActivities({ticket, userId})
+
+        if(!peopleActivities){
+            return({
+                ok: false,
+                status: 404,
+                msg: "No se han encontrado registros"
+            })
+        }
+
+        return({
+            ok: true,
+            status: 201,
+            peopleActivities
+        })
+
+
+    } catch (error) {
+        return({
+            ok: false,
+            status: 500,
+            msg: "error al procesar la solicitud"
+        })
+        
+    }
+}

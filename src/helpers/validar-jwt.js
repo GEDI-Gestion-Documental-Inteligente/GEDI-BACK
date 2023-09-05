@@ -18,7 +18,8 @@ export const validarJwt = (req, res, next) => {
         const decoded = jwt.verify(token, process.env.SECRET);
 
         // Si el token es válido, extraer el uid del usuario
-        req.ticket = decoded.uid
+        req.ticket = decoded.uid.id
+        req.userId = decoded.uid.userId
 
         console.log(req.ticket)
         // Puedes continuar con otras validaciones o acciones aquí, como buscar el usuario en la base de datos
