@@ -6,8 +6,6 @@ import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
 config()
 
-import authRoutes from './src/routes/auth.routes.js'
-import peopleRoutes from './src/routes/people.routes.js'
 import { connectDB } from './src/database.js'
 
 // Connect to DB
@@ -31,8 +29,11 @@ app.use(cookieParser({
 
 
 // Rutas
-app.use(authRoutes)
-app.use(peopleRoutes)
+import AuthLogin from './src/modules/authLogin/authLogin.controllers.js';
+import People from './src/modules/people/people.controllers.js';
+//
+app.use("/api/",AuthLogin)
+app.use("/api/people",People)
 
 // Not Found Routes
 app.use((req, res) => res.send(`<p>La ruta no válida: <strong>${req.url}</strong></p>`))
