@@ -1,12 +1,16 @@
 import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
-import path from 'path'
 import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
-config()
 
 import { connectDB } from './src/database.js'
+
+// Rutas
+import AuthLogin from './src/modules/authLogin/authLogin.controllers.js'
+import People from './src/modules/people/people.controllers.js'
+import Sites from './src/modules/sites/sites.controllers.js'
+config()
 
 // Connect to DB
 connectDB()
@@ -23,19 +27,13 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 app.use(morgan('dev'))
 app.use(cookieParser({
-    httpOnly: true,
-    secure: false,
+  httpOnly: true,
+  secure: false
 }))
-
-
-// Rutas
-import AuthLogin from './src/modules/authLogin/authLogin.controllers.js';
-import People from './src/modules/people/people.controllers.js';
-import Sites from './src/modules/sites/sites.controllers.js'
 //
-app.use("/api/",AuthLogin)
-app.use("/api/people",People)
-app.use("/api/sites",Sites)
+app.use('/api/', AuthLogin)
+app.use('/api/people', People)
+app.use('/api/sites', Sites)
 
 // Not Found Routes
 app.use((req, res) => res.send(`<p>La ruta no válida: <strong>${req.url}</strong></p>`))
