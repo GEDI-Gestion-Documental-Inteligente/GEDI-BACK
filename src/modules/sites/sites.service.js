@@ -1,4 +1,4 @@
-import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite } from './alfresco.service.js'
+import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite } from './alfresco.sites.service.js'
 
 // GET
 export const getSites = async ({ ticket }) => {
