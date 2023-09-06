@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { createSite, getSites } from './sites.service.js'
+import { createSite, deleteSite, getSites } from './sites.service.js'
 const router = Router()
 
 // GET
@@ -26,6 +26,19 @@ router.post('/create', validarJwt, async (req, res) => {
       }
     })
     return res.status(site.status).json(site)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+// DELETE
+
+router.delete('delete', validarJwt, async (req, res) => {
+  try {
+    const ticket = req.ticket
+    const idSite = req.params
+    const deletedSite = await deleteSite({ ticket, idSite })
+    return res.status(deletedSite.status).json(deletedSite)
   } catch (error) {
     return res.status(500).json(error)
   }

@@ -1,5 +1,4 @@
-import { getAlfrescoSites } from './api/getAlfrescoSites'
-import { createAlfrescoSite } from './api/createAlfrescoSites'
+import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite } from './alfresco.service.js'
 
 // GET
 export const getSites = async ({ ticket }) => {
@@ -10,7 +9,7 @@ export const getSites = async ({ ticket }) => {
       return {
         ok: false,
         status: 404,
-        msg: 'No hay sites'
+        msg: 'No se han encontrado sitios'
       }
     }
 
@@ -62,6 +61,35 @@ export const createSite = async ({ ticket, siteData }) => {
       status: 201,
       msg: 'Sitio creado en alfresco',
       alfrescoSite
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+// DELETE
+
+export const deleteSite = async ({ ticket, idSite }) => {
+  try {
+    const siteDeleted = await deleteAlfrescoSite({ ticket, idSite })
+
+    if (!siteDeleted) {
+      return {
+        ok: false,
+        status: 404,
+        msg: 'NO se ha encontrado el archivo'
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Archivo eliminado correctamente',
+      siteDeleted
     }
   } catch (error) {
     console.error('Error:', error.message)
