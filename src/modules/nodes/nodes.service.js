@@ -1,31 +1,4 @@
-import fetch from 'node-fetch'
-import { toConvertBase64 } from '../../helpers/convert-base64.js'
-// GET
-const getAlfrescoNodes = async ({ ticket, idNode }) => {
-  try {
-    const URL_CORE_API = process.env.URL_CORE_API
-    const URL_HOST = process.env.URL_HOST
-
-    const token = toConvertBase64(ticket)
-    // console.log(token);
-    const response = await fetch(
-            `http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}/children`,
-            {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Basic ${token}`
-              }
-            }
-    )
-    const data = await response.json()
-    // console.log(data);
-    return data
-  } catch (error) {
-    console.log(error)
-  }
-}
-
+import { getAlfrescoContent, getAlfrescoNodes } from './alfresco.nodes.service'
 // GET
 export const getNodes = async ({ ticket, idNode }) => {
   try {
@@ -55,43 +28,33 @@ export const getNodes = async ({ ticket, idNode }) => {
   }
 }
 
-// POST
+// GET CONTENT
 
-// const createAlfrescoNodes = async ({ ticket, siteData }) => {
-//     try {
-//         const URL_CORE_API = process.env.URL_CORE_API;
-//         const URL_HOST = process.env.URL_HOST;
-
-//         const token = toConvertBase64(ticket);
-//         const { id, title, description, visibility } =
-//             siteData;
-
-//             if (!id || !title || !description || !visibility) {
-//                 t
-//                 return {
-//                     ok: false,
-//                     msg: "Ocurrió algo con el servidor"
-//                 }
-//             }
-//         // console.log(token);
-//         const response = await fetch(
-//             `http://${URL_HOST}:8080/${URL_CORE_API}/nodes`,
-//             {
-//                 method: "POST",
-//                 headers: {
-//                     "Content-Type": "application/json",
-//                     Authorization: `Basic ${token}`,
-//                 },
-//                 body:JSON.stringify({id,title,description,visibility})
-//             }
-//         );
-//         const data = await response.json();
-//         // console.log(data);
-//         return data;
-//     } catch (error) {
-//         console.log(error);
-//     }
-// };
+export const getNodeContent = async ({ ticket, idNode }) => {
+  try {
+    const content = await getAlfrescoContent({ ticket, idNode })
+    if (!content) {
+      return {
+        ok: false,
+        status: 404,
+        msg: 'No se ha encontrado el archivo'
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Contenido del archivo:',
+      content
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Ocurrio un error en el servidor'
+    }
+  }
+}
 
 // export const createNodes = async ({ ticket, siteData }) => {
 //     try {

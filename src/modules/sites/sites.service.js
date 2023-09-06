@@ -82,7 +82,7 @@ export const deleteSite = async ({ ticket, idSite }) => {
       return {
         ok: false,
         status: 404,
-        msg: 'NO se ha encontrado el archivo'
+        msg: 'No se ha encontrado el sitio'
       }
     }
     return {
