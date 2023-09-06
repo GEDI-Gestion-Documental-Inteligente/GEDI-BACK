@@ -40,6 +40,7 @@ export const authLogin = async ({ userId, password }) => {
     if (!auth.entry.id) {
       return {
         ok: false,
+        status: 404,
         msg: 'Autenticación fallida.'
       }
     }
@@ -49,6 +50,7 @@ export const authLogin = async ({ userId, password }) => {
     const token = await generarJwt(authTicket, process.env.SECRET)
     return {
       ok: true,
+      status: 200,
       msg: 'Autenticado correctamente.',
       token
     }

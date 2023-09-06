@@ -14,7 +14,7 @@ router.post('/auth', async (req, res) => {
     req.cookies.token_ticket = loginAlfresco.token
     return res.status(loginAlfresco.status).json(loginAlfresco)
   } catch (error) {
-    console.error('Error:', error.msg)
+    console.error('Error:', error.message)
     return res.status(500).json({
       ok: false,
       msg: 'Ocurrió algo con el servidor'
