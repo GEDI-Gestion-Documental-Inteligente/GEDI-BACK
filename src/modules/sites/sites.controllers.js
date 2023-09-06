@@ -19,13 +19,13 @@ router.post('/create', validarJwt, async (req, res) => {
   try {
     const { id, title, description, visibility } = req.body
     const ticket = req.ticket
-    const person = await createSite({
+    const site = await createSite({
       ticket,
       siteData: {
         id, title, description, visibility
       }
     })
-    return res.status(person.status).json(person)
+    return res.status(site.status).json(site)
   } catch (error) {
     return res.status(500).json(error)
   }
