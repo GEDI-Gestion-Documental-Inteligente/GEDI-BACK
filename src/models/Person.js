@@ -1,43 +1,43 @@
-import mongoose from "mongoose"
+import mongoose from 'mongoose'
 
 const personSchema = new mongoose.Schema(
   {
     id: {
       type: String,
       required: true,
-      unique: true,
+      unique: true
     },
     firstName: {
       type: String,
-      required: true,
+      required: true
     },
     lastName: {
       type: String,
-      required: true,
+      required: true
     },
     email: {
       type: String,
       required: true,
-      unique: true,
+      unique: true
     },
     password: {
       type: String,
-      required: true,
+      required: true
     },
     skypeId: {
       type: String,
-      required: true,
+      required: true
     },
     jobTitle: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   {
-    timestamps: true, // Agrega campos createdAt y updatedAt automáticamente
+    timestamps: true // Agrega campos createdAt y updatedAt automáticamente
   }
-);
+)
 
-const Person = mongoose.model("Person", personSchema);
+const Person = mongoose.model('Person', personSchema)
 
 export default Person
