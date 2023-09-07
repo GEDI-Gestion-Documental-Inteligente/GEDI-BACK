@@ -1,6 +1,5 @@
 import fetch from 'node-fetch'
 import { toConvertBase64 } from '../../helpers/convert-base64.js'
-import fs from 'fs'
 
 // GET
 export const getAlfrescoNodes = async ({ ticket, idNode }) => {
@@ -28,6 +27,33 @@ export const getAlfrescoNodes = async ({ ticket, idNode }) => {
   }
 }
 
+// GET NODE INFORMATION
+
+export const getAlfrescoNodeInfo = async ({ ticket, idNode }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+
+    const token = toConvertBase64(ticket)
+    // console.log(token);
+    const response = await fetch(
+              `http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}`,
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Basic ${token}`
+                }
+              }
+    )
+    const data = await response.json()
+    // console.log(data);
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 // GET CONTENT ALFRESCO (POSIBLE DOWNLOAD?)
 
 export const getAlfrescoContent = async ({ ticket, idNode }) => {
@@ -36,7 +62,7 @@ export const getAlfrescoContent = async ({ ticket, idNode }) => {
     const URL_HOST = process.env.URL_HOST
 
     const token = toConvertBase64(ticket)
-    // console.log(token);
+    console.log(token)
     const response = await fetch(
                 `http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}/content`,
                 {
@@ -47,12 +73,8 @@ export const getAlfrescoContent = async ({ ticket, idNode }) => {
                   }
                 }
     )
-    const buffer = await response.buffer()
-    console.log(buffer)
-    const filename = 'archivo.pdf' // Nombre del archivo que desees
-    fs.writeFileSync(filename, buffer)
-    console.log(`Archivo guardado como ${filename}`)
-    return filename
+    const content = await response.blob()
+    return content.type
   } catch (error) {
     console.log(error)
   }

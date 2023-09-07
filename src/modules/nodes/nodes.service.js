@@ -1,4 +1,4 @@
-import { getAlfrescoContent, getAlfrescoNodes } from './alfresco.nodes.service.js'
+import { getAlfrescoContent, getAlfrescoNodeInfo, getAlfrescoNodes } from './alfresco.nodes.service.js'
 // GET
 export const getNodes = async ({ ticket, idNode }) => {
   try {
@@ -45,6 +45,34 @@ export const getNodeContent = async ({ ticket, idNode }) => {
       status: 200,
       msg: 'Contenido del archivo:',
       content
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Ocurrio un error en el servidor'
+    }
+  }
+}
+
+// GET NODE INFORMATION
+
+export const getNodeInfo = async ({ ticket, idNode }) => {
+  try {
+    const node = await getAlfrescoNodeInfo({ ticket, idNode })
+    if (!node) {
+      return {
+        ok: false,
+        status: 404,
+        msg: 'No se ha encontrado el nodo'
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Informacion del nodo:',
+      node
     }
   } catch (error) {
     console.error('Error:', error)

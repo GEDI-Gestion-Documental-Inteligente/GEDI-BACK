@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { /* createNodes, */ getNodeContent, getNodes } from './nodes.service.js'
+import { /* createNodes, */ getNodeContent, getNodeInfo, getNodes } from './nodes.service.js'
 const router = Router()
 
 // GET
@@ -20,6 +20,18 @@ router.get('/content/:id', validarJwt, async (req, res) => {
     const idNode = req.params.id
     const content = await getNodeContent({ ticket, idNode })
     return res.status(content.status).json(content)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+router.get('/info/:id', validarJwt, async (req, res) => {
+  try {
+    const ticket = req.ticket
+
+    const idNode = req.params.id
+    const node = await getNodeInfo({ ticket, idNode })
+    return res.status(node.status).json(node)
   } catch (error) {
     return res.status(500).json(error)
   }
