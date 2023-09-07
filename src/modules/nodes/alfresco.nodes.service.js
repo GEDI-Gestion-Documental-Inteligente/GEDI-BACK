@@ -1,6 +1,29 @@
 import fetch from 'node-fetch'
 import { toConvertBase64 } from '../../helpers/convert-base64.js'
 
+// GET
+export const getAlfrescoNodesChildrens = async ({ ticket, idNode }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+
+    const token = toConvertBase64(ticket)
+    // console.log(token);
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}/children`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${token}`
+      }
+    })
+    const data = await response.json()
+    // console.log(data);
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 // GET NODE INFORMATION
 
 export const getAlfrescoNodeInfo = async ({ ticket, idNode }) => {

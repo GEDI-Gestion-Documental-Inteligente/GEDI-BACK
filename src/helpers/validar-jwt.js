@@ -7,7 +7,7 @@ export const validarJwt = (req, res, next) => {
   if (!cookies || !cookies.token_ticket) {
     return res.status(401).json({
       ok: false,
-      msg: 'No hay token en las cookies'
+      msg: 'No hay token en la petición.'
     })
   }
 

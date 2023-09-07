@@ -5,11 +5,12 @@ export const getPeople = async ({ ticket }) => {
   try {
     const people = await getAlfrescoPeople({ ticket })
 
-    if (!people) {
+    if (people.error) {
       return {
         ok: false,
-        status: 404,
-        msg: 'No hay people'
+        status: people.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: people.error.errorKey
       }
     }
 
@@ -59,11 +60,12 @@ export const createPerson = async ({ ticket, personData }) => {
       }
     })
 
-    if (!alfrescoPerson) {
+    if (alfrescoPerson.error) {
       return {
         ok: false,
-        status: 404,
-        msg: 'No se encontró la persona en Alfresco.'
+        status: alfrescoPerson.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: alfrescoPerson.error.errorKey
       }
     }
     // Crear la persona en Mongoose utilizando los datos de Alfresco
@@ -100,11 +102,12 @@ export const getPeopleActivities = async ({ ticket, userId }) => {
 
     const peopleActivities = await getAlfrescoPeopleActivities({ ticket, userId })
 
-    if (!peopleActivities) {
+    if (peopleActivities.error) {
       return ({
         ok: false,
-        status: 404,
-        msg: 'No se han encontrado registros'
+        status: peopleActivities.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: peopleActivities.error.errorKey
       })
     }
 

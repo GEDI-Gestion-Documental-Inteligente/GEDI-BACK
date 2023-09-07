@@ -1,24 +1,36 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { /* createNodes, */ createNodes, getNodeContent, getNodeInfo } from './nodes.service.js'
+import { /* createNodes, */ createNodes, getNodeContent, getNodeInfo, getNodes } from './nodes.service.js'
 const router = Router()
 
 // GET
-router.get('/info/:id', validarJwt, async (req, res) => {
+router.get('/:idNode/childrens', validarJwt, async (req, res) => {
+  try {
+    const ticket = req.ticket
+    const idNode = req.params.idNode
+    const sites = await getNodes({ ticket, idNode })
+    return res.status(sites.status).json(sites)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+router.get('/:idNode', validarJwt, async (req, res) => {
   try {
     const ticket = req.ticket
 
-    const idNode = req.params.id
+    const idNode = req.params.idNode
     const node = await getNodeInfo({ ticket, idNode })
     return res.status(node.status).json(node)
   } catch (error) {
     return res.status(500).json(error)
   }
 })
-router.get('/content/:id', validarJwt, async (req, res) => {
+
+router.get('/content/:idNode', validarJwt, async (req, res) => {
   try {
     const ticket = req.ticket
-    const idNode = req.params.id
+    const idNode = req.params.idNode
     const content = await getNodeContent({ ticket, idNode })
     return res.status(content.status).json(content)
   } catch (error) {

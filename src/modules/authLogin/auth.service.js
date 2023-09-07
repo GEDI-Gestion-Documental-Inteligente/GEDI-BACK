@@ -8,11 +8,12 @@ export const authLogin = async ({ userId, password }) => {
   try {
     const auth = await getAlfrescoTicket({ userId, password })
 
-    if (!auth.entry.id) {
+    if (auth.error) {
       return {
         ok: false,
-        status: 404,
-        msg: 'Autenticación fallida.'
+        status: auth.error.statusCode,
+        msg: 'Hubo un error con Alfresco.',
+        error: auth.error.errorKey
       }
     }
 

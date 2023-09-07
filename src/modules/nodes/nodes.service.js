@@ -1,4 +1,38 @@
-import { createAlfrescoNodes, getAlfrescoContent, getAlfrescoNodeInfo } from './alfresco.nodes.service.js'
+import {
+  createAlfrescoNodes,
+  getAlfrescoContent,
+  getAlfrescoNodeInfo,
+  getAlfrescoNodesChildrens
+} from './alfresco.nodes.service.js'
+// GET
+export const getNodes = async ({ ticket, idNode }) => {
+  try {
+    const nodes = await getAlfrescoNodesChildrens({ ticket, idNode })
+
+    if (nodes.error) {
+      return {
+        ok: false,
+        status: nodes.error.statusCode,
+        msg: 'Hubo un error en alfresco.',
+        error: nodes.error.errorKey
+      }
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      msg: 'nodes:',
+      nodes
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Ocurrio un error en el servidor.'
+    }
+  }
+}
 
 // GET CONTENT
 
@@ -9,7 +43,7 @@ export const getNodeContent = async ({ ticket, idNode }) => {
       return {
         ok: false,
         status: content.error.statusCode,
-        msg: 'Hubo un error en Alfresco',
+        msg: 'Hubo un error en Alfresco.',
         error: content.error.errorKey
       }
     }
@@ -24,7 +58,7 @@ export const getNodeContent = async ({ ticket, idNode }) => {
     return {
       ok: false,
       status: 500,
-      msg: 'Ocurrio un error en el servidor'
+      msg: 'Ocurrio un error en el servidor.'
     }
   }
 }
@@ -38,7 +72,7 @@ export const getNodeInfo = async ({ ticket, idNode }) => {
       return {
         ok: false,
         status: node.error.statusCode,
-        msg: 'Hubo un error en alfresco',
+        msg: 'Hubo un error en alfresco.',
         error: node.error.errorKey
       }
     }
@@ -53,7 +87,7 @@ export const getNodeInfo = async ({ ticket, idNode }) => {
     return {
       ok: false,
       status: 500,
-      msg: 'Ocurrio un error en el servidor'
+      msg: 'Ocurrio un error en el servidor.'
     }
   }
 }
@@ -73,14 +107,14 @@ export const createNodes = async ({ ticket, idNode, nodeData }) => {
       return {
         ok: false,
         status: 400,
-        msg: 'Los campos obligatorios son requeridos'
+        msg: 'Los campos obligatorios son requeridos.'
       }
     }
     if (nodeType.includes('cm:')) {
       return {
         ok: false,
         status: 403,
-        msg: 'No incluya "cm:" dentro del typeNode'
+        msg: 'No incluya "cm:" dentro del typeNode.'
       }
     }
     // Crear el sitio en Alfresco
@@ -98,14 +132,14 @@ export const createNodes = async ({ ticket, idNode, nodeData }) => {
       return {
         ok: false,
         status: alfrescoNodes.error.statusCode,
-        msg: 'Hubo un error en alfresco',
+        msg: 'Hubo un error en Alfresco.',
         error: alfrescoNodes.error.errorKey
       }
     }
     return {
       ok: true,
       status: 201,
-      msg: 'Sitio creado en alfresco',
+      msg: 'Sitio creado en alfresco.',
       alfrescoNodes
     }
   } catch (error) {
