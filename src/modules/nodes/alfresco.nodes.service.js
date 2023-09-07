@@ -83,12 +83,6 @@ export const createAlfrescoNodes = async ({ ticket, nodeData, idNode }) => {
       name,
       nodeType: `cm:${nodeType}`
     }
-    if (!name || !nodeType) {
-      return {
-        ok: false,
-        msg: 'Ocurrió algo con el servidor'
-      }
-    }
     if (title && description) {
       bodyData = { ...bodyData, properties: { 'cm:title': title, 'cm:description': description } }
     }

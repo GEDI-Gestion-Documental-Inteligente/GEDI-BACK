@@ -102,19 +102,34 @@ export const createNodes = async ({ ticket, idNode, nodeData }) => {
         msg: 'Se requiere id del nodo'
       }
     }
+    if (nodeType.includes('cm:')) {
+      return {
+        ok: false,
+        status: 403,
+        msg: 'No incluya "cm:" dentro del typeNode.'
+      }
+    }
     // Validar los datos de entrada
-    if (!name || !nodeType) {
+    const validacionCampos = !name || !nodeType
+    const regexCampoNameTitle = /^[\p{L}\d\sáéíóúñÁÉÍÓÚÑ]{4,30}$/u // SOLO LETRAS Y LETRAS CON ACENTOS Y NUMEROS
+    const regexCampoType = /^[\p{L}\d\sáéíóúñÁÉÍÓÚÑ]{4,8}$/u // \d es digitos numéricos \s espacio
+    const regexCampoDescription = /^[\p{L}\d\sáéíóúñÁÉÍÓÚÑ]{4,252}$/u
+    // \p{L} para coincidir con cualquier carácter que sea una letra en cualquier idioma
+    const validacionRegex = regexCampoNameTitle.test(name.trim()) || regexCampoType.test(nodeType.trim())
+    if (validacionCampos || validacionRegex) {
       return {
         ok: false,
         status: 400,
         msg: 'Los campos obligatorios son requeridos.'
       }
     }
-    if (nodeType.includes('cm:')) {
+    const validacionIfTitleDescription =
+      ((description || title) && !regexCampoNameTitle.test(title)) || !regexCampoDescription.test(description)
+    if (validacionIfTitleDescription) {
       return {
         ok: false,
         status: 403,
-        msg: 'No incluya "cm:" dentro del typeNode.'
+        msg: 'los campos Title y Description no son bien escritos'
       }
     }
     // Crear el sitio en Alfresco
