@@ -41,4 +41,71 @@ export const alfrescoSearchWithTerm = async ({ ticket, term }) => {
   }
 }
 
-// endpoint para realizar busquedas por Sitios/nodes/people
+// endpoint para realizar busquedas por nodes
+export const alfrescoSearchNodes = async ({ ticket, term }) => {
+  const URL_CORE_API = process.env.URL_CORE_API
+  const URL_HOST = process.env.URL_HOST
+  const token = toConvertBase64(ticket)
+
+  try {
+    const termQuery = term.term
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/nodes/${termQuery}*`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${token}`
+      }
+    })
+    const data = await response.json()
+    console.log(data)
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// endpoint de alfresco para buscar sitios
+export const alfrescoSearchSites = async ({ ticket, term }) => {
+  const URL_CORE_API = process.env.URL_CORE_API
+  const URL_HOST = process.env.URL_HOST
+  const token = toConvertBase64(ticket)
+
+  try {
+    const termQuery = term.term
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/sites/${termQuery}*`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${token}`
+      }
+    })
+    const data = await response.json()
+    console.log(data)
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// endpoint de alfresco para buscar sitios
+export const alfrescoSearchPeople = async ({ ticket, term }) => {
+  const URL_CORE_API = process.env.URL_CORE_API
+  const URL_HOST = process.env.URL_HOST
+  const token = toConvertBase64(ticket)
+
+  try {
+    const termQuery = term.term
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/people/${termQuery}*`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${token}`
+      }
+    })
+    const data = await response.json()
+    console.log(data)
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
