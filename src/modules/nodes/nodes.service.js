@@ -1,43 +1,16 @@
-import { getAlfrescoContent, getAlfrescoNodeInfo, getAlfrescoNodes } from './alfresco.nodes.service.js'
-// GET
-export const getNodes = async ({ ticket, idNode }) => {
-  try {
-    const nodes = await getAlfrescoNodes({ ticket, idNode })
-
-    if (!nodes) {
-      return {
-        ok: false,
-        status: 404,
-        msg: 'No hay nodes'
-      }
-    }
-
-    return {
-      ok: true,
-      status: 200,
-      msg: 'nodes:',
-      nodes
-    }
-  } catch (error) {
-    console.error('Error:', error)
-    return {
-      ok: false,
-      status: 500,
-      msg: 'Ocurrio un error en el servidor'
-    }
-  }
-}
+import { createAlfrescoNodes, getAlfrescoContent, getAlfrescoNodeInfo } from './alfresco.nodes.service.js'
 
 // GET CONTENT
 
 export const getNodeContent = async ({ ticket, idNode }) => {
   try {
     const content = await getAlfrescoContent({ ticket, idNode })
-    if (!content) {
+    if (content.error) {
       return {
         ok: false,
-        status: 404,
-        msg: 'No se ha encontrado el archivo'
+        status: content.error.statusCode,
+        msg: 'Hubo un error en Alfresco',
+        error: content.error.errorKey
       }
     }
     return {
@@ -61,11 +34,12 @@ export const getNodeContent = async ({ ticket, idNode }) => {
 export const getNodeInfo = async ({ ticket, idNode }) => {
   try {
     const node = await getAlfrescoNodeInfo({ ticket, idNode })
-    if (!node) {
+    if (node.error) {
       return {
         ok: false,
-        status: 404,
-        msg: 'No se ha encontrado el nodo'
+        status: node.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: node.error.errorKey
       }
     }
     return {
@@ -84,41 +58,62 @@ export const getNodeInfo = async ({ ticket, idNode }) => {
   }
 }
 
-// export const createNodes = async ({ ticket, siteData }) => {
-//     try {
-//         const { id, title, description, visibility } =
-//             siteData;
-
-//         // Validar los datos de entrada
-//         if (!id || !title || !description || !visibility) {
-//             return {
-//                 ok: false,
-//                 status:400,
-//                 msg: "Los campos obligatorios son requeridos"
-//             }
-//         }
-
-//         // Crear el sitio en Alfresco
-//         const alfrescoNodes = await createAlfrescoNodes({
-//             ticket, siteData: {
-//                 id,
-//                 title,
-//                 description,
-//                 visibility
-//             }
-//         });
-
-//         return {
-//             ok: true,
-//             status: 201,
-//             msg: "Sitio creado en alfresco",
-//             alfrescoNodes
-//         };
-//     } catch (error) {
-//         console.error("Error:", error.message);
-//         return {
-//             ok: false,
-//             status: 500,
-//             msg: "Error al procesar la solicitud"
-//         };
-//     }};
+export const createNodes = async ({ ticket, idNode, nodeData }) => {
+  try {
+    const { name, nodeType, title, description } = nodeData
+    if (!idNode) {
+      return {
+        ok: false,
+        status: 403,
+        msg: 'Se requiere id del nodo'
+      }
+    }
+    // Validar los datos de entrada
+    if (!name || !nodeType) {
+      return {
+        ok: false,
+        status: 400,
+        msg: 'Los campos obligatorios son requeridos'
+      }
+    }
+    if (nodeType.includes('cm:')) {
+      return {
+        ok: false,
+        status: 403,
+        msg: 'No incluya "cm:" dentro del typeNode'
+      }
+    }
+    // Crear el sitio en Alfresco
+    const alfrescoNodes = await createAlfrescoNodes({
+      ticket,
+      idNode,
+      nodeData: {
+        name,
+        nodeType, //! solo mandar folder | content . NO => cm:folder | cm:content
+        title,
+        description
+      }
+    })
+    if (alfrescoNodes.error) {
+      return {
+        ok: false,
+        status: alfrescoNodes.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: alfrescoNodes.error.errorKey
+      }
+    }
+    return {
+      ok: true,
+      status: 201,
+      msg: 'Sitio creado en alfresco',
+      alfrescoNodes
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
