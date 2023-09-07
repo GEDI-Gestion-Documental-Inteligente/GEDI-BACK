@@ -16,9 +16,9 @@ router.post('/searchWithTerm', validarJwt, async (req, res) => {
   }
 })
 
-router.post('/searchNodes', validarJwt, async (req, res) => {
+router.get('/searchNodes', validarJwt, async (req, res) => {
   const ticket = req.ticket
-  const term = req.query.params
+  const term = req.query
 
   try {
     const resultQuery = await sendQueriesForNodes({ ticket, term })
@@ -28,9 +28,9 @@ router.post('/searchNodes', validarJwt, async (req, res) => {
   }
 })
 
-router.post('/searchSites', validarJwt, async (req, res) => {
+router.get('/searchSites', validarJwt, async (req, res) => {
   const ticket = req.ticket
-  const term = req.query.params
+  const term = req.query
 
   try {
     const resultQuery = await sendQueriesForNodes({ ticket, term })
@@ -40,9 +40,9 @@ router.post('/searchSites', validarJwt, async (req, res) => {
   }
 })
 
-router.post('/searchPeople', validarJwt, async (req, res) => {
+router.get('/searchPeople', validarJwt, async (req, res) => {
   const ticket = req.ticket
-  const term = req.query.params
+  const term = req.query
 
   try {
     const resultQuery = await sendQueriesForNodes({ ticket, term })

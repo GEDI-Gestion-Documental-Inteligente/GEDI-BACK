@@ -48,8 +48,10 @@ export const alfrescoSearchNodes = async ({ ticket, term }) => {
   const token = toConvertBase64(ticket)
 
   try {
-    const termQuery = term.term
-    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/nodes/${termQuery}*`, {
+    const termQuery = encodeURIComponent(term.term)
+
+    console.log(termQuery)
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/nodes?term=${termQuery}*`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +74,7 @@ export const alfrescoSearchSites = async ({ ticket, term }) => {
 
   try {
     const termQuery = term.term
-    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/sites/${termQuery}*`, {
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/sites?term=${termQuery}*`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -95,7 +97,7 @@ export const alfrescoSearchPeople = async ({ ticket, term }) => {
 
   try {
     const termQuery = term.term
-    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/people/${termQuery}*`, {
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/people?term=${termQuery}*`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
