@@ -48,6 +48,7 @@ export const getAlfrescoContent = async ({ ticket, idNode }) => {
                 }
     )
     const buffer = await response.buffer()
+    console.log(buffer)
     const filename = 'archivo.pdf' // Nombre del archivo que desees
     fs.writeFileSync(filename, buffer)
     console.log(`Archivo guardado como ${filename}`)
