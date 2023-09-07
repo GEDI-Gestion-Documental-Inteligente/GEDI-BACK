@@ -1,4 +1,4 @@
-import { getAlfrescoPeople, createAlfrescoPerson, getAlfrescoPeopleActivities } from './alfresco.people.service'
+import { getAlfrescoPeople, createAlfrescoPerson, getAlfrescoPeopleActivities } from './alfresco.people.service.js'
 import Person from '../../models/Person.js'
 
 export const getPeople = async ({ ticket }) => {

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { authLogin } from './authLogin.service.js'
+import { authLogin } from './auth.service.js'
 const router = Router()
 
 router.post('/auth', async (req, res) => {

@@ -1,4 +1,4 @@
-import { getAlfrescoContent, getAlfrescoNodes } from './alfresco.nodes.service'
+import { getAlfrescoContent, getAlfrescoNodes } from './alfresco.nodes.service.js'
 // GET
 export const getNodes = async ({ ticket, idNode }) => {
   try {

@@ -1,5 +1,5 @@
 // Importar NodeFetch
-import { getAlfrescoTicket } from './alfresco.auth.service'
+import { getAlfrescoTicket } from './alfresco.auth.service.js'
 // import helpers
 import { generarJwt } from '../../helpers/generar-jwt.js'
 // Configurar URL's por defecto

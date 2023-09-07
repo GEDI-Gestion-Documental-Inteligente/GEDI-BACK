@@ -8,9 +8,10 @@ import { config } from 'dotenv'
 import { connectDB } from './src/database.js'
 
 // Rutas
-import AuthLogin from './src/modules/authLogin/authLogin.controllers.js'
+import AuthLogin from './src/modules/authLogin/auth.controllers.js'
 import People from './src/modules/people/people.controllers.js'
 import Sites from './src/modules/sites/sites.controllers.js'
+import Nodes from './src/modules/nodes/nodes.controllers.js'
 config()
 
 // Connect to DB
@@ -35,6 +36,7 @@ app.use(cookieParser({
 app.use('/api/', AuthLogin)
 app.use('/api/people', People)
 app.use('/api/sites', Sites)
+app.use('/api/nodes', Nodes)
 
 // Not Found Routes
 app.use((req, res) => res.send(`<p>La ruta no válida: <strong>${req.url}</strong></p>`))

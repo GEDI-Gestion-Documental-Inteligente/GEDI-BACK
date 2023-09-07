@@ -1,5 +1,6 @@
 import fetch from 'node-fetch'
 import { toConvertBase64 } from '../../helpers/convert-base64.js'
+import fs from 'fs'
 
 // GET
 export const getAlfrescoNodes = async ({ ticket, idNode }) => {
@@ -46,9 +47,11 @@ export const getAlfrescoContent = async ({ ticket, idNode }) => {
                   }
                 }
     )
-    const data = await response.json()
-    // console.log(data);
-    return data
+    const buffer = await response.buffer()
+    const filename = 'archivo.pdf' // Nombre del archivo que desees
+    fs.writeFileSync(filename, buffer)
+    console.log(`Archivo guardado como ${filename}`)
+    return filename
   } catch (error) {
     console.log(error)
   }
