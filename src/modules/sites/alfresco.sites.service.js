@@ -89,7 +89,7 @@ export const deleteAlfrescoSite = async ({ ticket, idSite }) => {
   }
 }
 
-export const createSiteMemberAlfresco = async ({ ticket, idSite, siteData }) => {
+export const createSiteMemberAlfresco = async ({ ticket, idSite, personData }) => {
   try {
     const URL_CORE_API = process.env.URL_CORE_API
     const URL_HOST = process.env.URL_HOST
@@ -97,7 +97,7 @@ export const createSiteMemberAlfresco = async ({ ticket, idSite, siteData }) => 
     const token = toConvertBase64(ticket)
     // console.log(token);
     const { id, role } =
-              siteData
+              personData
 
     if (!id || !role) {
       return {
@@ -118,6 +118,41 @@ export const createSiteMemberAlfresco = async ({ ticket, idSite, siteData }) => 
     )
     const data = await response.json()
     // console.log(data);
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const createGroupMemberAlfresco = async ({ ticket, idSite, groupData }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+
+    const token = toConvertBase64(ticket)
+    // console.log(token);
+    const { id, role } =
+              groupData
+
+    if (!id || !role) {
+      return {
+        ok: false,
+        msg: 'Los campos no llegaron al fetch'
+      }
+    }
+    const response = await fetch(
+              `http://${URL_HOST}:8080/${URL_CORE_API}/sites/${idSite}/members`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Basic ${token}`
+                },
+                body: JSON.stringify({ id, role })
+              }
+    )
+    const data = await response.json()
+    // console.log(data)
     return data
   } catch (error) {
     console.log(error)
