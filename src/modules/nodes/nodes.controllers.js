@@ -1,11 +1,24 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { /* createNodes, */ createNodes, getNodeContent, getNodeInfo, getNodes } from './nodes.service.js'
+import { createNodes, getNodeContent, getNodeInfo, getNodes } from './nodes.service.js'
 const router = Router()
 
 // GET
+router.get('/:idNode', validarJwt, async (req, res) => {
+  try {
+    // obtiene la información de un nodo
+    const ticket = req.ticket
+    const idNode = req.params.idNode
+    const node = await getNodeInfo({ ticket, idNode })
+    return res.status(node.status).json(node)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
 router.get('/:idNode/childrens', validarJwt, async (req, res) => {
   try {
+    // obtiene la información de los hijos del nodo
     const ticket = req.ticket
     const idNode = req.params.idNode
     const sites = await getNodes({ ticket, idNode })
@@ -15,20 +28,9 @@ router.get('/:idNode/childrens', validarJwt, async (req, res) => {
   }
 })
 
-router.get('/:idNode', validarJwt, async (req, res) => {
+router.get('/:idNode/content', validarJwt, async (req, res) => {
   try {
-    const ticket = req.ticket
-
-    const idNode = req.params.idNode
-    const node = await getNodeInfo({ ticket, idNode })
-    return res.status(node.status).json(node)
-  } catch (error) {
-    return res.status(500).json(error)
-  }
-})
-
-router.get('/content/:idNode', validarJwt, async (req, res) => {
-  try {
+    // obtiene el contenido del nodo => sirve para archivos por ejemplo: pdf
     const ticket = req.ticket
     const idNode = req.params.idNode
     const content = await getNodeContent({ ticket, idNode })
@@ -39,8 +41,10 @@ router.get('/content/:idNode', validarJwt, async (req, res) => {
 })
 
 // POST
-router.post('/create/:idParent', validarJwt, async (req, res) => {
+router.post('/:idParent/create', validarJwt, async (req, res) => {
   try {
+  // crea un nodo a partir de un nombre del nodo y su tipo [folder,content]
+  // tambien puede recibir como caracteristica interna un title y description
     const { name, nodeType, title, description } = req.body
     const ticket = req.ticket
     const idNode = req.params.idParent
