@@ -1,4 +1,4 @@
-import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite, createSiteMemberAlfresco } from './alfresco.sites.service.js'
+import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite, createSiteMemberAlfresco, createGroupMemberAlfresco } from './alfresco.sites.service.js'
 
 // GET
 export const getSites = async ({ ticket }) => {
@@ -118,6 +118,47 @@ export const createSiteMember = async ({ ticket, idSite, personData }) => {
       msg: 'Miembro añadido correctamente',
       alfrescoSiteMember
     }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+// ENDPOINT DE ALFRESCO PARA AÑADIR GRUPO A UN SITIO NO FUNCIONA EN LA VERSION UTILIZADA
+// ESTA EN PRUEBA LA OPCION DE AÑADIR EN BASE A GRUPOS COMO SI FUERA UN ARRAY 1 POR 1 (se testeara su dificultad de implementarlo en frontend)
+
+export const createSiteGroupMember = async ({ ticket, idSite, groupData }) => {
+  try {
+    const results = []
+
+    for (const group of groupData) {
+      const { id, role } = group
+      const alfrescoSiteGroupMember = await createGroupMemberAlfresco({ ticket, idSite, groupData: { id, role } })
+      console.log(group)
+      console.log(alfrescoSiteGroupMember.error)
+
+      if (alfrescoSiteGroupMember.error) {
+        results.push({
+          ok: false,
+          status: alfrescoSiteGroupMember.error.statusCode,
+          msg: 'Hubo un error en alfresco',
+          error: alfrescoSiteGroupMember.error.errorKey
+        })
+      } else {
+        results.push({
+          ok: true,
+          status: 201,
+          msg: 'Grupo añadido correctamente',
+          alfrescoSiteGroupMember
+        })
+      }
+    }
+
+    return results
   } catch (error) {
     console.error('Error:', error.message)
     return {
