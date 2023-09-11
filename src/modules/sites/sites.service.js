@@ -1,4 +1,4 @@
-import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite } from './alfresco.sites.service.js'
+import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite, createSiteMemberAlfresco } from './alfresco.sites.service.js'
 
 // GET
 export const getSites = async ({ ticket }) => {
@@ -90,6 +90,33 @@ export const deleteSite = async ({ ticket, idSite }) => {
       status: 200,
       msg: 'Archivo eliminado correctamente',
       siteDeleted
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const createSiteMember = async ({ ticket, idSite, personData }) => {
+  try {
+    const alfrescoSiteMember = await createSiteMemberAlfresco({ ticket, idSite, personData })
+    if (alfrescoSiteMember.error) {
+      return {
+        ok: false,
+        status: alfrescoSiteMember.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: alfrescoSiteMember.error.errorKey
+      }
+    }
+    return {
+      ok: true,
+      status: 201,
+      msg: 'Miembro añadido correctamente',
+      alfrescoSiteMember
     }
   } catch (error) {
     console.error('Error:', error.message)

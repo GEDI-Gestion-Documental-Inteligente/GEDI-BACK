@@ -14,13 +14,11 @@ export const getPeople = async ({ ticket }) => {
       }
     }
 
-    const ourPeople = Person.find()
     return {
       ok: true,
       status: 200,
       msg: 'people:',
-      people,
-      mongo: ourPeople
+      people
     }
   } catch (error) {
     console.error('Error:', error)

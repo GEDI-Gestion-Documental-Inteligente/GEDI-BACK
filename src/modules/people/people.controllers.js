@@ -26,6 +26,7 @@ router.get('/allPeople', validarJwt, async (req, res) => {
     const people = await getPeople({ ticket })
     return res.status(people.status).json(people)
   } catch (error) {
+    console.error(error)
     return res.status(500).json(error)
   }
 })

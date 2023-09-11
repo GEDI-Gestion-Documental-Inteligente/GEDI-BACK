@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { createSite, deleteSite, getSites } from './sites.service.js'
+import { createSite, createSiteMember, deleteSite, getSites } from './sites.service.js'
 const router = Router()
 
 // GET
@@ -33,13 +33,33 @@ router.post('/create', validarJwt, async (req, res) => {
 
 // DELETE
 
-router.delete('delete', validarJwt, async (req, res) => {
+router.delete('/delete', validarJwt, async (req, res) => {
   try {
     const ticket = req.ticket
     const idSite = req.params
     const deletedSite = await deleteSite({ ticket, idSite })
     return res.status(deletedSite.status).json(deletedSite)
   } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+// el id corresponde al sitio donde sera agregada la persona y se le da un rol en el mismo
+router.post('/create-member/:id', validarJwt, async (req, res) => {
+  try {
+    const ticket = req.ticket
+    const idSite = req.params.id
+    const { id, role } = req.body
+    const siteMember = await createSiteMember({
+      ticket,
+      idSite,
+      personData: {
+        id, role
+      }
+    })
+    return res.status(siteMember.status).json(siteMember)
+  } catch (error) {
+    console.error(error)
     return res.status(500).json(error)
   }
 })
