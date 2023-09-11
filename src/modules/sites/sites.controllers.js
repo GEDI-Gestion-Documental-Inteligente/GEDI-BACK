@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { createSite, createSiteMember, deleteSite, getSites } from './sites.service.js'
+import { createSite, createSiteGroupMember, createSiteMember, deleteSite, getSites } from './sites.service.js'
 const router = Router()
 
 // GET
@@ -58,6 +58,25 @@ router.post('/create-member/:id', validarJwt, async (req, res) => {
       }
     })
     return res.status(siteMember.status).json(siteMember)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json(error)
+  }
+})
+
+// el id del body corresponde al id del grupo
+router.post('/create-group-member/:id', validarJwt, async (req, res) => {
+  try {
+    const ticket = req.ticket
+    const idSite = req.params.id
+    console.log(idSite)
+    const groupData = req.body
+    const siteGroupMember = await createSiteGroupMember({
+      ticket,
+      idSite,
+      groupData
+    })
+    return res.json(siteGroupMember)
   } catch (error) {
     console.error(error)
     return res.status(500).json(error)
