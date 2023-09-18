@@ -1,3 +1,4 @@
+import Site from '../../models/SIte.js'
 import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite, createSiteMemberAlfresco, createGroupMemberAlfresco } from './alfresco.sites.service.js'
 
 // GET
@@ -55,6 +56,20 @@ export const createSite = async ({ ticket, siteData }) => {
         visibility
       }
     })
+
+    if (alfrescoSite.error) {
+      return {
+        ok: false,
+        status: alfrescoSite.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: alfrescoSite.error.errorKey
+      }
+    }
+
+    const newSite = new Site(alfrescoSite.entry)
+
+    const mongoSite = await newSite.save()
+    console.log(mongoSite) // Mostrar por consola para que no joda el linter
 
     return {
       ok: true,
