@@ -26,14 +26,14 @@ export const getAlfrescoGroups = async ({ ticket }) => {
   }
 }
 
-export const createAlfrescoGroup = async ({ ticket, siteData }) => {
+export const createAlfrescoGroup = async ({ ticket, groupData }) => {
   try {
     const URL_CORE_API = process.env.URL_CORE_API
     const URL_HOST = process.env.URL_HOST
 
     const token = toConvertBase64(ticket)
     const { id, displayName, parentIds } =
-              siteData
+              groupData
 
     if (!id || !displayName) {
       return {
@@ -58,6 +58,7 @@ export const createAlfrescoGroup = async ({ ticket, siteData }) => {
     return data
   } catch (error) {
     console.log(error)
+    return error
   }
 }
 
@@ -81,6 +82,39 @@ export const deleteAlfrescoGroup = async ({ ticket, idGroup }) => {
               }
     )
     const data = await response
+    return data
+  } catch (error) {
+    console.log(error)
+    return error
+  }
+}
+
+export const createAlfrescoMemberGroup = async ({ ticket, idGroup, idMember }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+
+    const dataMember = {
+      id: idMember,
+      memberType: 'PERSON'
+    }
+
+    const token = toConvertBase64(ticket)
+
+    // console.log(token);
+    const response = await fetch(
+              `http://${URL_HOST}:8080/${URL_CORE_API}/groups/${idGroup}/members`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Basic ${token}`
+                },
+                body: JSON.stringify(dataMember)
+              }
+    )
+    const data = await response.json()
+    console.log(data)
     return data
   } catch (error) {
     console.log(error)

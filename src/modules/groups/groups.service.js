@@ -1,4 +1,4 @@
-import { createAlfrescoGroup, deleteAlfrescoGroup, getAlfrescoGroups } from './alfresco.groups.service.js'
+import { createAlfrescoGroup, createAlfrescoMemberGroup, deleteAlfrescoGroup, getAlfrescoGroups } from './alfresco.groups.service.js'
 
 export const getGroups = async ({ ticket }) => {
   try {
@@ -48,7 +48,7 @@ export const createGroup = async ({ ticket, groupData }) => {
     // Crear el Grupo en Alfresco
     const alfrescoGroup = await createAlfrescoGroup({
       ticket,
-      siteData: {
+      groupData: {
         id,
         displayName,
         parentIds
@@ -89,6 +89,35 @@ export const deleteGroup = async ({ ticket, idGroup }) => {
       ok: true,
       status: 200,
       msg: 'Archivo eliminado correctamente'
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const createGroupMember = async ({ ticket, idGroup, idMember }) => {
+  try {
+    console.log(ticket)
+    const createdMember = await createAlfrescoMemberGroup({ ticket, idGroup, idMember })
+
+    if (createdMember.error) {
+      return {
+        ok: false,
+        status: createdMember.error.statusCode,
+        msg: 'Hubo un error en alfresco.',
+        error: createdMember.error.errorKey
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Miembro asignado correctamente',
+      createdMember
     }
   } catch (error) {
     console.error('Error:', error.message)
