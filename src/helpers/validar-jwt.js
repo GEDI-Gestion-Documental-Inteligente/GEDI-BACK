@@ -1,18 +1,14 @@
 import jwt from 'jsonwebtoken'
 
 export const validarJwt = (req, res, next) => {
-  const cookies = req.cookies
-
+  const token = req.header('Authorization')
   // Verificar si no existen cookies o si no hay un token en las cookies
-  if (!cookies || !cookies.token_ticket) {
+  if (!token) {
     return res.status(401).json({
       ok: false,
       msg: 'No hay token en la petición.'
     })
   }
-
-  const token = cookies.token_ticket
-
   try {
     // Verificar si el token es válido
     const decoded = jwt.verify(token, process.env.SECRET)

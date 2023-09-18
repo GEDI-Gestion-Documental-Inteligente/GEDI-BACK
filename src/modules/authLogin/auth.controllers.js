@@ -8,10 +8,8 @@ router.post('/auth', async (req, res) => {
     const loginAlfresco = await authLogin({ userId, password })
 
     if (!loginAlfresco.ok) {
-      return res.json(loginAlfresco)
+      return res.status(loginAlfresco.status).json(loginAlfresco)
     }
-
-    req.cookies.token_ticket = loginAlfresco.token
     return res.status(loginAlfresco.status).json(loginAlfresco)
   } catch (error) {
     console.error('Error:', error.message)
