@@ -158,3 +158,35 @@ export const createGroupMemberAlfresco = async ({ ticket, idSite, groupData }) =
     console.log(error)
   }
 }
+
+export const getAlfrescoDocumentLibrary = async ({ ticket, siteName }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+
+    const token = toConvertBase64(ticket)
+    // console.log(token);
+
+    if (!siteName) {
+      return {
+        ok: false,
+        msg: 'Los campos no llegaron al fetch'
+      }
+    }
+    const response = await fetch(
+              `http://${URL_HOST}:8080/${URL_CORE_API}/sites/${siteName}/containers/documentLibrary`,
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Basic ${token}`
+                }
+              }
+    )
+    const data = await response.json()
+    console.log(data)
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
