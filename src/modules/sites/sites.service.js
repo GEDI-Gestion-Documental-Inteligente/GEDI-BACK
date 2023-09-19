@@ -1,16 +1,17 @@
 import Site from '../../models/SIte.js'
-import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite, createSiteMemberAlfresco, createGroupMemberAlfresco } from './alfresco.sites.service.js'
+import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite, createSiteMemberAlfresco, createGroupMemberAlfresco, getAlfrescoDocumentLibrary } from './alfresco.sites.service.js'
 
 // GET
 export const getSites = async ({ ticket }) => {
   try {
     const sites = await getAlfrescoSites({ ticket })
 
-    if (!sites) {
+    if (sites.error) {
       return {
         ok: false,
-        status: 404,
-        msg: 'No se han encontrado sitios'
+        status: sites.error.statusCode,
+        msg: 'No se han encontrado sitios',
+        error: sites.error.errorKey
       }
     }
 
@@ -180,6 +181,35 @@ export const createSiteGroupMember = async ({ ticket, idSite, groupData }) => {
       ok: false,
       status: 500,
       msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const getContainerDocumentLibrary = async ({ ticket, siteName }) => {
+  try {
+    const containerDocumentLibrary = await getAlfrescoDocumentLibrary({ ticket, siteName })
+
+    if (containerDocumentLibrary.error) {
+      return {
+        ok: false,
+        status: containerDocumentLibrary.error.statusCode,
+        msg: 'No se ha encontrado el contenedor',
+        error: containerDocumentLibrary.error.errorKey
+      }
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Document Library:',
+      containerDocumentLibrary
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Ocurrio un error en el servidor'
     }
   }
 }
