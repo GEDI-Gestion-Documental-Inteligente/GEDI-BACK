@@ -1,8 +1,10 @@
+import Node from '../../models/Node.js'
 import {
   createAlfrescoNodes,
   getAlfrescoContent,
   getAlfrescoNodeInfo,
-  getAlfrescoNodesChildrens
+  getAlfrescoNodesChildrens,
+  uploadAlfrescoContent
 } from './alfresco.nodes.service.js'
 // GET
 export const getNodes = async ({ ticket, idNode }) => {
@@ -92,21 +94,14 @@ export const getNodeInfo = async ({ ticket, idNode }) => {
   }
 }
 
-export const createNodes = async ({ ticket, idNode, nodeData }) => {
+export const createFolder = async ({ ticket, idNode, nodeData }) => {
   try {
-    const { name, nodeType, title, description } = nodeData
+    const { name, title, description } = nodeData
     if (!idNode) {
       return {
         ok: false,
         status: 403,
         msg: 'Se requiere id del nodo'
-      }
-    }
-    if (nodeType.includes('cm:')) {
-      return {
-        ok: false,
-        status: 403,
-        msg: 'No incluya "cm:" dentro del typeNode.'
       }
     }
     // Crear el sitio en Alfresco
@@ -115,7 +110,7 @@ export const createNodes = async ({ ticket, idNode, nodeData }) => {
       idNode,
       nodeData: {
         name,
-        nodeType, //! solo mandar folder | content . NO => cm:folder | cm:content
+        nodeType: 'cm:folder',
         title,
         description
       }
@@ -128,11 +123,85 @@ export const createNodes = async ({ ticket, idNode, nodeData }) => {
         error: alfrescoNodes.error.errorKey
       }
     }
+    const newNode = new Node({
+      createdByUser: alfrescoNodes.entry.createdByUser,
+      nodeType: alfrescoNodes.entry.nodeType,
+      parentId: alfrescoNodes.entry.parentId,
+      id: alfrescoNodes.entry.id,
+      properties: alfrescoNodes.entry.properties,
+      buffer: null
+    })
+
+    const mongoNode = await newNode.save()
     return {
       ok: true,
       status: 201,
-      msg: 'Sitio creado en alfresco.',
-      alfrescoNodes
+      msg: 'Folder creada correctamente',
+      alfrescoNodes,
+      mongoNode
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const uploadContent = async ({ ticket, idNode, nodeData, file }) => {
+  try {
+    const { /* name, */ /*  nodeType,  */ title, description } = nodeData
+    if (!idNode) {
+      return {
+        ok: false,
+        status: 403,
+        msg: 'Se requiere id del nodo'
+      }
+    }
+    // Crear el sitio en Alfresco
+    const alfrescoContent = await uploadAlfrescoContent({
+      ticket,
+      idNode,
+      file,
+      nodeData: {
+        /* name, */
+        /* nodeType, */ //! solo mandar folder | content . NO => cm:folder | cm:content
+        title,
+        description
+      }
+    })
+    if (alfrescoContent.error) {
+      return {
+        ok: false,
+        status: alfrescoContent.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: alfrescoContent.error.errorKey
+      }
+    }
+    const idCreatedContent = alfrescoContent.entry.id
+    const nodeContent = await getAlfrescoContent({ ticket, idCreatedContent })
+    console.log(nodeContent)
+    console.log(alfrescoContent.entry.createdByUser)
+    const newNode = new Node({
+      createdByUser: alfrescoContent.entry.createdByUser,
+      name: alfrescoContent.entry.name,
+      nodeType: alfrescoContent.entry.nodeType,
+      parentId: alfrescoContent.entry.parentId,
+      id: alfrescoContent.entry.id,
+      properties: { ...alfrescoContent.entry.content, ...alfrescoContent.entry.properties },
+      buffer: nodeContent
+    })
+
+    const mongoNode = await newNode.save()
+
+    return {
+      ok: true,
+      status: 201,
+      msg: 'Contenido subido correctamente',
+      alfrescoContent,
+      mongoNode
     }
   } catch (error) {
     console.error('Error:', error.message)
