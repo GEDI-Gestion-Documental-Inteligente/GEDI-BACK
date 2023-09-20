@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { createNodes, getNodeContent, getNodeInfo, getNodes } from './nodes.service.js'
+import { createFolder, getNodeContent, getNodeInfo, getNodes, uploadContent } from './nodes.service.js'
 const router = Router()
 
 // GET
@@ -45,20 +45,43 @@ router.post('/:idParent/create', validarJwt, async (req, res) => {
   try {
   // crea un nodo a partir de un nombre del nodo y su tipo [folder,content]
   // tambien puede recibir como caracteristica interna un title y description
-    const { name, nodeType, title, description } = req.body
+    const { name, title, description } = req.body
     const ticket = req.ticket
     const idNode = req.params.idParent
-    const person = await createNodes({
+    const person = await createFolder({
       ticket,
       idNode,
       nodeData: {
         name,
         title,
-        nodeType,
         description
       }
     })
     return res.status(person.status).json(person)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+// POST
+router.post('/:idParent/uploadContent', validarJwt, async (req, res) => {
+  try {
+    const file = req.file
+    const { /* name,  *//* nodeType,  */title, description } = req.body
+    const ticket = req.ticket
+    const idNode = req.params.idParent
+    const content = await uploadContent({
+      ticket,
+      idNode,
+      file,
+      nodeData: {
+        /* name, */
+        title,
+        /*  nodeType, */
+        description
+      }
+    })
+    return res.status(content.status).json(content)
   } catch (error) {
     return res.status(500).json(error)
   }

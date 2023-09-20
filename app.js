@@ -2,7 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
 import { config } from 'dotenv'
-
+import multer from 'multer'
+import path from 'path'
 import { connectDB } from './src/database.js'
 
 // Rutas
@@ -17,13 +18,21 @@ config()
 connectDB()
 
 // Settings
-
 const port = 4000
 const app = express()
 
-// Middlewares
-app.use(express.json())
+const storage = multer.diskStorage({
+  destination: path.join('./uploads'),
+  filename: function (req, file, cb) {
+    cb(null, new Date().getTime() + path.extname(file.originalname))
+  }
+})
 
+const upload = multer({ storage })
+
+// Middlewares
+app.use(upload.single('filedata'))
+app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 app.use(morgan('dev'))
