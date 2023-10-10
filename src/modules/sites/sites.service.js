@@ -1,5 +1,5 @@
 import Site from '../../models/SIte.js'
-import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite, createSiteMemberAlfresco, createGroupMemberAlfresco, getAlfrescoDocumentLibrary } from './alfresco.sites.service.js'
+import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite, createSiteMemberAlfresco, createGroupMemberAlfresco, getAlfrescoDocumentLibrary, getAlfrescoMySites } from './alfresco.sites.service.js'
 
 // GET
 export const getSites = async ({ ticket }) => {
@@ -203,6 +203,35 @@ export const getContainerDocumentLibrary = async ({ ticket, siteName }) => {
       status: 200,
       msg: 'Document Library:',
       containerDocumentLibrary
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Ocurrio un error en el servidor'
+    }
+  }
+}
+
+export const getMySites = async ({ ticket }) => {
+  try {
+    const mysites = await getAlfrescoMySites({ ticket })
+
+    if (mysites.error) {
+      return {
+        ok: false,
+        status: mysites.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: mysites.error.errorKey
+      }
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Mis sitios:',
+      mysites
     }
   } catch (error) {
     console.error('Error:', error)
