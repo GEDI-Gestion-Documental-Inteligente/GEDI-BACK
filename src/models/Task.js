@@ -1,15 +1,7 @@
 import mongoose from 'mongoose'
 
-const WorkFlowSchema = new mongoose.Schema({
-  processDefinitionKey: {
-    type: String,
-    required: true
-  },
-  startUserId: {
-    type: String,
-    required: true
-  },
-  startedAt: {
+const TaskSchema = new mongoose.Schema({
+  expirationDate: {
     type: String,
     required: true
   },
@@ -17,16 +9,32 @@ const WorkFlowSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  completed: {
-    type: Boolean,
-    required: true
-  },
-  expirationDate: {
+  name: {
     type: String,
     required: true
   },
-  tasks: {
-    type: Object,
+  description: {
+    type: String,
+    required: true
+  },
+  startedAt: {
+    type: String,
+    required: true
+  },
+  id: {
+    type: String,
+    required: true
+  },
+  assignee: {
+    type: String,
+    required: true
+  },
+  state: {
+    type: String,
+    required: true
+  },
+  priority: {
+    type: String,
     required: true
   }
 },
@@ -34,6 +42,6 @@ const WorkFlowSchema = new mongoose.Schema({
   timestamps: true // Agrega campos createdAt y updatedAt automáticamente
 })
 
-const WorkFlow = mongoose.model('WorkFlow', WorkFlowSchema)
+const Task = mongoose.model('Task', TaskSchema)
 
-export default WorkFlow
+export default Task
