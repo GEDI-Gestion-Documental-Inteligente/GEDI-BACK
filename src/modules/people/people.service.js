@@ -4,6 +4,7 @@ import Person from '../../models/Person.js'
 export const getPeople = async ({ ticket }) => {
   try {
     const people = await getAlfrescoPeople({ ticket })
+    const mongoPeople = await Person.find()
 
     if (people.error) {
       return {
@@ -18,7 +19,8 @@ export const getPeople = async ({ ticket }) => {
       ok: true,
       status: 200,
       msg: 'people:',
-      people
+      people,
+      mongoPeople
     }
   } catch (error) {
     console.error('Error:', error)

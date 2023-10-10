@@ -124,6 +124,7 @@ export const createFolder = async ({ ticket, idNode, nodeData }) => {
       }
     }
     const newNode = new Node({
+      name: alfrescoNodes.entry.name,
       createdByUser: alfrescoNodes.entry.createdByUser,
       nodeType: alfrescoNodes.entry.nodeType,
       parentId: alfrescoNodes.entry.parentId,
@@ -152,7 +153,7 @@ export const createFolder = async ({ ticket, idNode, nodeData }) => {
 
 export const uploadContent = async ({ ticket, idNode, nodeData, file }) => {
   try {
-    const { /* name, */ /*  nodeType,  */ title, description } = nodeData
+    const { name, /*  nodeType,  */ title, description, typeDocument } = nodeData
     if (!idNode) {
       return {
         ok: false,
@@ -166,10 +167,11 @@ export const uploadContent = async ({ ticket, idNode, nodeData, file }) => {
       idNode,
       file,
       nodeData: {
-        /* name, */
+        name,
         /* nodeType, */ //! solo mandar folder | content . NO => cm:folder | cm:content
         title,
-        description
+        description,
+        typeDocument
       }
     })
     if (alfrescoContent.error) {
