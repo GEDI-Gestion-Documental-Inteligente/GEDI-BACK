@@ -13,6 +13,7 @@ import Sites from './src/modules/sites/sites.controllers.js'
 import Nodes from './src/modules/nodes/nodes.controllers.js'
 import Queries from './src/modules/queries/queries.controllers.js'
 import Groups from './src/modules/groups/groups.controllers.js'
+import WorkFlows from './src/modules/workflow/workflow.controllers.js'
 config()
 
 // Connect to DB
@@ -44,6 +45,7 @@ app.use('/api/sites', Sites)
 app.use('/api/nodes', Nodes)
 app.use('/api/queries', Queries)
 app.use('/api/groups', Groups)
+app.use('/api/workflow', WorkFlows)
 
 // Not Found Routes
 app.use((req, res) => res.send(`<p>La ruta no válida: <strong>${req.url}</strong></p>`))
