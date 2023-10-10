@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { createSite, createSiteGroupMember, createSiteMember, deleteSite, getContainerDocumentLibrary, getSites } from './sites.service.js'
+import { createSite, createSiteGroupMember, createSiteMember, deleteSite, getContainerDocumentLibrary, getMySites, getSites } from './sites.service.js'
 const router = Router()
 
 // GET
@@ -89,7 +89,19 @@ router.get('/getContainerSite/:siteName', validarJwt, async (req, res) => {
 
   try {
     const containerDocumentLibrary = await getContainerDocumentLibrary({ ticket, siteName })
-    return res.json(containerDocumentLibrary)
+    return res.status(containerDocumentLibrary.status).json(containerDocumentLibrary)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json(error)
+  }
+})
+
+router.get('/getMySites', validarJwt, async (req, res) => {
+  const ticket = req.ticket
+
+  try {
+    const mysites = await getMySites({ ticket })
+    return res.status(mysites.status).json(mysites)
   } catch (error) {
     console.error(error)
     return res.status(500).json(error)
