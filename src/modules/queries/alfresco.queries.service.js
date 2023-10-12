@@ -8,31 +8,34 @@ export const alfrescoSearchWithTerm = async ({ ticket, term }) => {
   const token = toConvertBase64(ticket)
   try {
     const termQuery = term.term
-    const response = await fetch(`http://${URL_HOST}:8080/${URL_SEARCH_API}/search`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${token}`
-      },
-      body: JSON.stringify({
-        query: {
-          // eslint-disable-next-line no-useless-escape
-          query: `(name:\'${termQuery}*\' OR title:\'${termQuery}*\')`
+    const response = await fetch(
+      `http://${URL_HOST}:8080/${URL_SEARCH_API}/search`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${token}`
         },
-        highlight: {
-          fields: [
-            {
-              field: 'cm:name',
-              prefix: '(',
-              postfix: ')'
-            },
-            {
-              field: '{http://www.alfresco.org/model/content/1.0}title'
-            }
-          ]
-        }
-      })
-    })
+        body: JSON.stringify({
+          query: {
+            // eslint-disable-next-line no-useless-escape
+            query: `(name:\'${termQuery}*\' OR title:\'${termQuery}*\')`
+          },
+          highlight: {
+            fields: [
+              {
+                field: 'cm:name',
+                prefix: '(',
+                postfix: ')'
+              },
+              {
+                field: '{http://www.alfresco.org/model/content/1.0}title'
+              }
+            ]
+          }
+        })
+      }
+    )
     const data = await response.json()
     console.log(data)
     return data
@@ -42,22 +45,26 @@ export const alfrescoSearchWithTerm = async ({ ticket, term }) => {
 }
 
 // endpoint para realizar busquedas por nodes
-export const alfrescoSearchNodes = async ({ ticket, term }) => {
+export const alfrescoSearchNodes = async ({ ticket, term, root }) => {
   const URL_CORE_API = process.env.URL_CORE_API
   const URL_HOST = process.env.URL_HOST
   const token = toConvertBase64(ticket)
 
   try {
-    const termQuery = encodeURIComponent(term.term)
+    const termQuery = encodeURIComponent(term)
+    const rootId = encodeURIComponent(root)
 
     console.log(termQuery)
-    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/nodes?term=${termQuery}*`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${token}`
+    const response = await fetch(
+      `http://${URL_HOST}:8080/${URL_CORE_API}/queries/nodes?term=${termQuery}*&rootNodeId=${rootId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${token}`
+        }
       }
-    })
+    )
     const data = await response.json()
     console.log(data)
     return data
@@ -74,13 +81,16 @@ export const alfrescoSearchSites = async ({ ticket, term }) => {
 
   try {
     const termQuery = term.term
-    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/sites?term=${termQuery}*`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${token}`
+    const response = await fetch(
+      `http://${URL_HOST}:8080/${URL_CORE_API}/queries/sites?term=${termQuery}*`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${token}`
+        }
       }
-    })
+    )
     const data = await response.json()
     console.log(data)
     return data
@@ -97,13 +107,16 @@ export const alfrescoSearchPeople = async ({ ticket, term }) => {
 
   try {
     const termQuery = term.term
-    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/queries/people?term=${termQuery}*`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${token}`
+    const response = await fetch(
+      `http://${URL_HOST}:8080/${URL_CORE_API}/queries/people?term=${termQuery}*`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${token}`
+        }
       }
-    })
+    )
     const data = await response.json()
     console.log(data)
     return data

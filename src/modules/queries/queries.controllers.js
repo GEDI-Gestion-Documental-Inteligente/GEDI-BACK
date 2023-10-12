@@ -18,10 +18,11 @@ router.post('/searchWithTerm', validarJwt, async (req, res) => {
 
 router.get('/searchNodes', validarJwt, async (req, res) => {
   const ticket = req.ticket
-  const term = req.query
+  const { term } = req.query
+  const { root } = req.query
 
   try {
-    const resultQuery = await sendQueriesForNodes({ ticket, term })
+    const resultQuery = await sendQueriesForNodes({ ticket, term, root })
     return res.status(resultQuery.status).json(resultQuery)
   } catch (error) {
     return res.status(500).json(error)

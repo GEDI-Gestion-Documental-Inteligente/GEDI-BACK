@@ -24,6 +24,7 @@ export const authLogin = async ({ userId, password }) => {
       ok: true,
       status: 200,
       msg: 'Autenticado correctamente.',
+      userId,
       token
     }
   } catch (error) {
