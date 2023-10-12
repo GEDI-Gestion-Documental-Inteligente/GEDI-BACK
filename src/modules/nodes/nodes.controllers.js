@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { createFolder, getNodeContent, getNodeInfo, getNodes, uploadContent } from './nodes.service.js'
+import { createFolder, getNodeContent, getNodeInfo, getNodeParents, getNodes, updateNode, updatePermissionsNode, updateTypeNode, uploadContent } from './nodes.service.js'
 const router = Router()
 
 // GET
@@ -21,8 +21,20 @@ router.get('/:idNode/childrens', validarJwt, async (req, res) => {
     // obtiene la información de los hijos del nodo
     const ticket = req.ticket
     const idNode = req.params.idNode
-    const sites = await getNodes({ ticket, idNode })
-    return res.status(sites.status).json(sites)
+    const nodes = await getNodes({ ticket, idNode })
+    return res.status(nodes.status).json(nodes)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+router.get('/:idNode/parents', validarJwt, async (req, res) => {
+  try {
+    // obtiene la información de los hijos del nodo
+    const ticket = req.ticket
+    const idNode = req.params.idNode
+    const parentNodes = await getNodeParents({ ticket, idNode })
+    return res.status(parentNodes.status).json(parentNodes)
   } catch (error) {
     return res.status(500).json(error)
   }
@@ -63,11 +75,32 @@ router.post('/:idParent/create', validarJwt, async (req, res) => {
   }
 })
 
+// PUT
+router.put('/update-permissions/:id', validarJwt, async (req, res) => {
+  try {
+    const { authorityId, name, accessStatus } = req.body
+    const ticket = req.ticket
+    const idNode = req.params.id
+    const updatedPermissions = await updatePermissionsNode({
+      ticket,
+      idNode,
+      nodeData: {
+        authorityId,
+        name,
+        accessStatus
+      }
+    })
+    return res.status(updatedPermissions.status).json(updatedPermissions)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
 // POST
 router.post('/:idParent/uploadContent', validarJwt, async (req, res) => {
   try {
     const file = req.file
-    const { name, /* nodeType,  */title, description, typeDocument } = req.body
+    const { name, title, description, typeDocument } = req.body
     const ticket = req.ticket
     const idNode = req.params.idParent
     const content = await uploadContent({
@@ -77,12 +110,51 @@ router.post('/:idParent/uploadContent', validarJwt, async (req, res) => {
       nodeData: {
         name,
         title,
-        /*  nodeType, */
         description,
         typeDocument
       }
     })
     return res.status(content.status).json(content)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+// PUT
+router.put('/update/:id', validarJwt, async (req, res) => {
+  try {
+    const { name, title, description } = req.body
+    const ticket = req.ticket
+    const idNode = req.params.id
+    const updatedNode = await updateNode({
+      ticket,
+      idNode,
+      nodeData: {
+        name,
+        title,
+        description
+      }
+    })
+    return res.status(updatedNode.status).json(updatedNode)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+// PUT
+router.put('/update-type/:id', validarJwt, async (req, res) => {
+  try {
+    const { typeDocument } = req.body
+    const ticket = req.ticket
+    const idNode = req.params.id
+    const updatedTypeNode = await updateTypeNode({
+      ticket,
+      idNode,
+      nodeData: {
+        typeDocument
+      }
+    })
+    return res.status(updatedTypeNode.status).json(updatedTypeNode)
   } catch (error) {
     return res.status(500).json(error)
   }

@@ -4,12 +4,17 @@ import {
   getAlfrescoContent,
   getAlfrescoNodeInfo,
   getAlfrescoNodesChildrens,
+  getAlfrescoNodesParents,
+  updateAlfrescoNode,
+  updatePermissionsAlfrescoNode,
+  updateTypeAlfrescoNode,
   uploadAlfrescoContent
 } from './alfresco.nodes.service.js'
 // GET
 export const getNodes = async ({ ticket, idNode }) => {
   try {
     const nodes = await getAlfrescoNodesChildrens({ ticket, idNode })
+    const nodesMongo = await Node.find()
 
     if (nodes.error) {
       return {
@@ -24,7 +29,39 @@ export const getNodes = async ({ ticket, idNode }) => {
       ok: true,
       status: 200,
       msg: 'nodes:',
-      nodes
+      nodes,
+      nodesMongo
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Ocurrio un error en el servidor.'
+    }
+  }
+}
+
+// GET
+
+export const getNodeParents = async ({ ticket, idNode }) => {
+  try {
+    const parentNodes = await getAlfrescoNodesParents({ ticket, idNode })
+
+    if (parentNodes.error) {
+      return {
+        ok: false,
+        status: parentNodes.error.statusCode,
+        msg: 'Hubo un error en alfresco.',
+        error: parentNodes.error.errorKey
+      }
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      msg: 'parents node:',
+      parentNodes
     }
   } catch (error) {
     console.error('Error:', error)
@@ -112,7 +149,8 @@ export const createFolder = async ({ ticket, idNode, nodeData }) => {
         name,
         nodeType: 'cm:folder',
         title,
-        description
+        description,
+        typeDocument: 'Carpeta'
       }
     })
     if (alfrescoNodes.error) {
@@ -151,9 +189,61 @@ export const createFolder = async ({ ticket, idNode, nodeData }) => {
   }
 }
 
+export const updatePermissionsNode = async ({ ticket, idNode, nodeData }) => {
+  try {
+    const { authorityId, name, accessStatus } = nodeData
+    if (!idNode) {
+      return {
+        ok: false,
+        status: 403,
+        msg: 'Se requiere id del nodo'
+      }
+    }
+
+    if (!authorityId || !name || !accessStatus) {
+      return {
+        ok: false,
+        status: 400,
+        msg: 'Los campos obligatorios son requeridos'
+      }
+    }
+    // Crear el sitio en Alfresco
+    const changedPermissions = await updatePermissionsAlfrescoNode({
+      ticket,
+      idNode,
+      nodeData: {
+        authorityId,
+        name,
+        accessStatus
+      }
+    })
+    if (changedPermissions.error) {
+      return {
+        ok: false,
+        status: changedPermissions.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: changedPermissions.error.errorKey
+      }
+    }
+    return {
+      ok: true,
+      status: 201,
+      msg: 'Permisos actualizados correctamente',
+      changedPermissions
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
 export const uploadContent = async ({ ticket, idNode, nodeData, file }) => {
   try {
-    const { name, /*  nodeType,  */ title, description, typeDocument } = nodeData
+    const { name, title, description, typeDocument } = nodeData
     if (!idNode) {
       return {
         ok: false,
@@ -168,7 +258,6 @@ export const uploadContent = async ({ ticket, idNode, nodeData, file }) => {
       file,
       nodeData: {
         name,
-        /* nodeType, */ //! solo mandar folder | content . NO => cm:folder | cm:content
         title,
         description,
         typeDocument
@@ -204,6 +293,148 @@ export const uploadContent = async ({ ticket, idNode, nodeData, file }) => {
       msg: 'Contenido subido correctamente',
       alfrescoContent,
       mongoNode
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const updateNode = async ({ ticket, idNode, nodeData }) => {
+  try {
+    const { name, title, description } = nodeData
+    if (!idNode) {
+      return {
+        ok: false,
+        status: 403,
+        msg: 'Se requiere id del nodo'
+      }
+    }
+    if (!name || !title || !description) {
+      return {
+        ok: false,
+        status: 400,
+        msg: 'Los campos obligatorios son requeridos'
+      }
+    }
+    // Crear el sitio en Alfresco
+    const updatedNode = await updateAlfrescoNode({
+      ticket,
+      idNode,
+      nodeData: {
+        name,
+        title,
+        description
+      }
+    })
+    if (updatedNode.error) {
+      return {
+        ok: false,
+        status: updatedNode.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: updatedNode.error.errorKey
+      }
+    }
+
+    const updatedNodeMongo = await Node.findOneAndUpdate(
+      { id: idNode },
+      {
+        $set: {
+          name,
+          'properties.cm:title': title,
+          'properties.cm:description': description
+        }
+      },
+      { new: true }
+    )
+
+    if (!updatedNodeMongo) {
+      return {
+        ok: false,
+        status: 404,
+        msg: 'No se encontró el sitio en MongoDB'
+      }
+    }
+
+    return {
+      ok: true,
+      status: 201,
+      msg: 'Nodo actualizado correctamente',
+      updatedNode,
+      updatedNodeMongo
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const updateTypeNode = async ({ ticket, idNode, nodeData }) => {
+  try {
+    const { typeDocument } = nodeData
+    if (!idNode) {
+      return {
+        ok: false,
+        status: 403,
+        msg: 'Se requiere id del nodo'
+      }
+    }
+    if (!typeDocument) {
+      return {
+        ok: false,
+        status: 400,
+        msg: 'Los campos obligatorios son requeridos'
+      }
+    }
+    // Crear el sitio en Alfresco
+    const updatedTypeNode = await updateTypeAlfrescoNode({
+      ticket,
+      idNode,
+      nodeData: {
+        typeDocument
+      }
+    })
+    if (updatedTypeNode.error) {
+      return {
+        ok: false,
+        status: updatedTypeNode.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: updatedTypeNode.error.errorKey
+      }
+    }
+
+    const updatedTypeNodeMongo = await Node.findOneAndUpdate(
+      { id: idNode },
+      {
+        $set: {
+          'properties.cm:type': typeDocument
+        }
+      },
+      { new: true }
+    )
+
+    if (!updatedTypeNodeMongo) {
+      return {
+        ok: false,
+        status: 404,
+        msg: 'No se encontró el sitio en MongoDB'
+      }
+    }
+
+    return {
+      ok: true,
+      status: 201,
+      msg: 'Nodo actualizado correctamente',
+      updatedTypeNode,
+      updatedTypeNodeMongo
     }
   } catch (error) {
     console.error('Error:', error.message)

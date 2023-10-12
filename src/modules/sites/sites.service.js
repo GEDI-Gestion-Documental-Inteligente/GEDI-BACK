@@ -126,11 +126,11 @@ export const updateSite = async ({ ticket, siteData, idSite }) => {
             siteData
 
     // Validar los datos de entrada
-    if (!title && !description && !visibility) {
+    if (!title || !description || !visibility) {
       return {
         ok: false,
         status: 400,
-        msg: 'No estas mandando ningun valor en los campos'
+        msg: 'Los campos obligatorios son requeridos'
       }
     }
 
