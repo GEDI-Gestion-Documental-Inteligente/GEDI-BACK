@@ -1,10 +1,11 @@
 import Site from '../../models/SIte.js'
-import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite, createSiteMemberAlfresco, createGroupMemberAlfresco, getAlfrescoDocumentLibrary, getAlfrescoMySites } from './alfresco.sites.service.js'
+import { getAlfrescoSites, createAlfrescoSite, deleteAlfrescoSite, createSiteMemberAlfresco, getAlfrescoDocumentLibrary, getAlfrescoMySites, getAlfrescoOneSite, updateAlfrescoSite, getSiteMembersAlfresco, getOneSiteMemberAlfresco, updateSiteMemberAlfresco, deleteSiteMemberAlfresco } from './alfresco.sites.service.js'
 
 // GET
 export const getSites = async ({ ticket }) => {
   try {
     const sites = await getAlfrescoSites({ ticket })
+    const sitesMongo = await Site.find()
 
     if (sites.error) {
       return {
@@ -19,7 +20,39 @@ export const getSites = async ({ ticket }) => {
       ok: true,
       status: 200,
       msg: 'sites:',
-      sites
+      sites,
+      sitesMongo
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Ocurrio un error en el servidor'
+    }
+  }
+}
+
+// GET
+
+export const getOneSite = async ({ ticket, idSite }) => {
+  try {
+    const site = await getAlfrescoOneSite({ ticket, idSite })
+    const siteMongo = await Site.findOne({ id: idSite })
+    if (site.error) {
+      return {
+        ok: false,
+        status: site.error.statusCode,
+        msg: 'No se han encontrado sitios',
+        error: site.error.errorKey
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
+      msg: 'sites:',
+      site,
+      siteMongo
     }
   } catch (error) {
     console.error('Error:', error)
@@ -87,25 +120,94 @@ export const createSite = async ({ ticket, siteData }) => {
     }
   }
 }
+export const updateSite = async ({ ticket, siteData, idSite }) => {
+  try {
+    const { title, description, visibility } =
+            siteData
 
+    // Validar los datos de entrada
+    if (!title || !description || !visibility) {
+      return {
+        ok: false,
+        status: 400,
+        msg: 'Los campos obligatorios son requeridos'
+      }
+    }
+
+    // Actualizar sitio
+    const updatedAlfrescoSite = await updateAlfrescoSite({
+      ticket,
+      idSite,
+      siteData: {
+        title,
+        description,
+        visibility
+      }
+    })
+
+    if (updatedAlfrescoSite.error) {
+      return {
+        ok: false,
+        status: updatedAlfrescoSite.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: updatedAlfrescoSite.error.errorKey
+      }
+    }
+    const updatedSiteMongo = await Site.findOneAndUpdate(
+      { id: idSite },
+      {
+        title,
+        description,
+        visibility
+      },
+      { new: true }
+    )
+
+    if (!updatedSiteMongo) {
+      return {
+        ok: false,
+        status: 404,
+        msg: 'No se encontró el sitio en MongoDB'
+      }
+    }
+
+    return {
+      ok: true,
+      status: 201,
+      msg: 'Sitio creado en alfresco',
+      updatedAlfrescoSite,
+      updatedSiteMongo
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
 // DELETE
 
 export const deleteSite = async ({ ticket, idSite }) => {
   try {
-    const siteDeleted = await deleteAlfrescoSite({ ticket, idSite })
+    const alfrescoSiteDeleted = await deleteAlfrescoSite({ ticket, idSite })
+    const mongoSiteDeleted = await Site.findOneAndDelete({ id: idSite })
 
-    if (!siteDeleted) {
+    if (alfrescoSiteDeleted.error) {
       return {
         ok: false,
-        status: 404,
-        msg: 'No se ha encontrado el sitio'
+        status: alfrescoSiteDeleted.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: alfrescoSiteDeleted.error.errorKey
+
       }
     }
     return {
       ok: true,
-      status: 200,
-      msg: 'Archivo eliminado correctamente',
-      siteDeleted
+      status: 204,
+      msg: 'Sitio eliminado correctamente',
+      mongoSiteDeleted
     }
   } catch (error) {
     console.error('Error:', error.message)
@@ -117,9 +219,76 @@ export const deleteSite = async ({ ticket, idSite }) => {
   }
 }
 
+// SERVICIOS PARA GESTIONAR MIEMBROS DE UN SITIO
+
+// GET
+export const getSiteMembers = async ({ ticket, idSite }) => {
+  try {
+    const alfrescoSiteMembers = await getSiteMembersAlfresco({ ticket, idSite })
+    if (alfrescoSiteMembers.error) {
+      return {
+        ok: false,
+        status: alfrescoSiteMembers.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: alfrescoSiteMembers.error.errorKey
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Miembros del sitio:',
+      alfrescoSiteMembers
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const getOneSiteMember = async ({ ticket, idSite, idPerson }) => {
+  try {
+    const alfrescoSiteMember = await getOneSiteMemberAlfresco({ ticket, idSite, idPerson })
+    if (alfrescoSiteMember.error) {
+      return {
+        ok: false,
+        status: alfrescoSiteMember.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: alfrescoSiteMember.error.errorKey
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Miembro del sitio:',
+      alfrescoSiteMember
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+// POST
 export const createSiteMember = async ({ ticket, idSite, personData }) => {
   try {
     const alfrescoSiteMember = await createSiteMemberAlfresco({ ticket, idSite, personData })
+    const { id, role } = personData
+
+    if (!id || !role) {
+      return {
+        ok: false,
+        status: 400,
+        msg: 'Los campos obligatorios son requeridos'
+      }
+    }
     if (alfrescoSiteMember.error) {
       return {
         ok: false,
@@ -144,37 +313,33 @@ export const createSiteMember = async ({ ticket, idSite, personData }) => {
   }
 }
 
-// ENDPOINT DE ALFRESCO PARA AÑADIR GRUPO A UN SITIO NO FUNCIONA EN LA VERSION UTILIZADA
-// ESTA EN PRUEBA LA OPCION DE AÑADIR EN BASE A GRUPOS COMO SI FUERA UN ARRAY 1 POR 1 (se testeara su dificultad de implementarlo en frontend)
-
-export const createSiteGroupMember = async ({ ticket, idSite, groupData }) => {
+// UPDATE
+export const updateSiteMember = async ({ ticket, idSite, personData, idPerson }) => {
   try {
-    const results = []
+    const updatedAlfrescoSiteMember = await updateSiteMemberAlfresco({ ticket, idSite, personData, idPerson })
+    const { role } = personData
 
-    for (const group of groupData) {
-      const { id, role } = group
-      const alfrescoSiteGroupMember = await createGroupMemberAlfresco({ ticket, idSite, groupData: { id, role } })
-      console.log(group)
-      console.log(alfrescoSiteGroupMember.error)
-
-      if (alfrescoSiteGroupMember.error) {
-        results.push({
-          ok: false,
-          status: alfrescoSiteGroupMember.error.statusCode,
-          msg: 'Hubo un error en alfresco',
-          error: alfrescoSiteGroupMember.error.errorKey
-        })
-      } else {
-        results.push({
-          ok: true,
-          status: 201,
-          msg: 'Grupo añadido correctamente',
-          alfrescoSiteGroupMember
-        })
+    if (!role) {
+      return {
+        ok: false,
+        status: 400,
+        msg: 'Los campos obligatorios son requeridos'
       }
     }
-
-    return results
+    if (updatedAlfrescoSiteMember.error) {
+      return {
+        ok: false,
+        status: updatedAlfrescoSiteMember.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: updatedAlfrescoSiteMember.error.errorKey
+      }
+    }
+    return {
+      ok: true,
+      status: 201,
+      msg: 'Miembro actualizado correctamente',
+      updatedAlfrescoSiteMember
+    }
   } catch (error) {
     console.error('Error:', error.message)
     return {
@@ -185,6 +350,36 @@ export const createSiteGroupMember = async ({ ticket, idSite, groupData }) => {
   }
 }
 
+// DELETE
+export const deleteSiteMember = async ({ ticket, idSite, idPerson }) => {
+  try {
+    const deletedAlfrescoSiteMember = await deleteSiteMemberAlfresco({ ticket, idSite, idPerson })
+
+    if (deletedAlfrescoSiteMember.error) {
+      return {
+        ok: false,
+        status: deletedAlfrescoSiteMember.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: deletedAlfrescoSiteMember.error.errorKey
+      }
+    }
+    return {
+      ok: true,
+      status: 204,
+      msg: 'Miembro eliminado correctamente',
+      deletedAlfrescoSiteMember
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+// SERVICIOS EXTRA
 export const getContainerDocumentLibrary = async ({ ticket, siteName }) => {
   try {
     const containerDocumentLibrary = await getAlfrescoDocumentLibrary({ ticket, siteName })

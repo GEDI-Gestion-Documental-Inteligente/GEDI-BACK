@@ -9,18 +9,17 @@ export const createAlfrescoWorkFlow = async ({ ticket, nodeData }) => {
     const token = toConvertBase64(ticket)
     console.log(token)
 
-    const { assignee, description, expirationDate, priority } = nodeData
+    const { assignee, message, expirationDate, priority } = nodeData
 
     const bodyData = {
       processDefinitionKey: 'activitiAdhoc',
       variables: {
-        bpm_workflowDescription: description,
+        bpm_workflowDescription: message,
         bpm_assignee: assignee,
         bpm_workflowPriority: priority,
         bpm_workflowDueDate: expirationDate
       }
     }
-    console.log(JSON.stringify(bodyData))
     const response = await fetch(`http://${URL_HOST}:8080/${URL_WORKFLOW_API}/processes`, {
       method: 'POST',
       headers: {
@@ -64,9 +63,7 @@ export const addAlfrescoWorkFlowItems = async ({ ticket, idWorkFlow, items }) =>
     const URL_WORKFLOW_API = process.env.URL_WORKFLOW_API
     const URL_HOST = process.env.URL_HOST
     const token = toConvertBase64(ticket)
-    const bodyData = {
-      id: items
-    }
+    const bodyData = items.map(id => ({ id }))
 
     console.log(bodyData)
 
@@ -76,7 +73,28 @@ export const addAlfrescoWorkFlowItems = async ({ ticket, idWorkFlow, items }) =>
         'Content-Type': 'application/json',
         Authorization: `Basic ${token}`
       },
-      body: bodyData
+      body: JSON.stringify(bodyData)
+    })
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// get
+export const getAlfrescoWorkFlowItems = async ({ ticket, idWorkFlow }) => {
+  try {
+    const URL_WORKFLOW_API = process.env.URL_WORKFLOW_API
+    const URL_HOST = process.env.URL_HOST
+    const token = toConvertBase64(ticket)
+
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_WORKFLOW_API}/processes/${idWorkFlow}/items`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${token}`
+      }
     })
     const data = await response.json()
     return data

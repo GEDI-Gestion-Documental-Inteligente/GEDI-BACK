@@ -25,6 +25,29 @@ export const getAlfrescoNodesChildrens = async ({ ticket, idNode }) => {
   }
 }
 
+// GET
+export const getAlfrescoNodesParents = async ({ ticket, idNode }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+
+    const token = toConvertBase64(ticket)
+    // console.log(token);
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}/parents`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${token}`
+      }
+    })
+    const data = await response.json()
+    // console.log(data);
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 // GET NODE INFORMATION
 
 export const getAlfrescoNodeInfo = async ({ ticket, idNode }) => {
@@ -71,6 +94,7 @@ export const getAlfrescoContent = async ({ ticket, idNode }) => {
     console.log(error)
   }
 }
+
 // POST
 
 export const createAlfrescoNodes = async ({ ticket, nodeData, idNode }) => {
@@ -79,13 +103,13 @@ export const createAlfrescoNodes = async ({ ticket, nodeData, idNode }) => {
     const URL_HOST = process.env.URL_HOST
 
     const token = toConvertBase64(ticket)
-    const { name, title, description, nodeType } = nodeData
+    const { name, title, description, nodeType, typeDocument } = nodeData
     let bodyData = {
       name,
       nodeType
     }
     if (title && description) {
-      bodyData = { ...bodyData, properties: { 'cm:title': title, 'cm:description': description } }
+      bodyData = { ...bodyData, properties: { 'cm:title': title, 'cm:description': description, 'cm:typeDocument': typeDocument } }
     }
     // console.log(token);
     const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}/children`, {
@@ -111,7 +135,7 @@ export const uploadAlfrescoContent = async ({ ticket, nodeData, idNode, file }) 
     const URL_HOST = process.env.URL_HOST
     const token = toConvertBase64(ticket)
     // se omiten los campos nombre y nodetype ya que no son necesarios (alfresco detecta que es type content)
-    const { /* nodeType, */ name, title, description, typeDocument } = nodeData
+    const { name, title, description, typeDocument } = nodeData
     console.log(nodeData)
 
     // se obtiene el buffer del archivo
@@ -144,6 +168,107 @@ export const uploadAlfrescoContent = async ({ ticket, nodeData, idNode, file }) 
         console.error(error)
       }
     })
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// PUT
+
+export const updateAlfrescoNode = async ({ ticket, nodeData, idNode }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+    const token = toConvertBase64(ticket)
+    // se omiten los campos nombre y nodetype ya que no son necesarios (alfresco detecta que es type content)
+    const { name, title, description } = nodeData
+    console.log(nodeData)
+
+    const bodyData = {
+      name,
+      properties: {
+        'cm:title': title,
+        'cm:description': description
+      }
+    }
+
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Basic ${token}`
+      },
+      body: JSON.stringify(bodyData) // Enviar FormData en lugar de JSON
+    })
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// PUT
+
+export const updateTypeAlfrescoNode = async ({ ticket, nodeData, idNode }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+    const token = toConvertBase64(ticket)
+    // se omiten los campos nombre y nodetype ya que no son necesarios (alfresco detecta que es type content)
+    const { typeDocument } = nodeData
+
+    const bodyData = {
+      properties: {
+        'cm:type': typeDocument
+      }
+    }
+
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Basic ${token}`
+      },
+      body: JSON.stringify(bodyData) // Enviar FormData en lugar de JSON
+    })
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const updatePermissionsAlfrescoNode = async ({ ticket, nodeData, idNode }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+
+    const token = toConvertBase64(ticket)
+    const { authorityId, name, accessStatus } = nodeData
+
+    const bodyData = {
+      permissions: {
+        isInheritanceEnabled: false,
+        locallySet: [
+          {
+            authorityId,
+            name,
+            accessStatus
+          }
+        ]
+      }
+    }
+    // console.log(token);
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${token}`
+      },
+      body: JSON.stringify(bodyData)
+    })
+    const data = await response.json()
     return data
   } catch (error) {
     console.log(error)
