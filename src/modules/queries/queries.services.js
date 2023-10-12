@@ -29,9 +29,9 @@ export const sendQueriesWithTerm = async ({ ticket, term }) => {
   }
 }
 
-export const sendQueriesForNodes = async ({ ticket, term }) => {
+export const sendQueriesForNodes = async ({ ticket, term, root }) => {
   try {
-    const resultQuery = await alfrescoSearchNodes({ ticket, term })
+    const resultQuery = await alfrescoSearchNodes({ ticket, term, root })
 
     if (resultQuery.error) {
       return {
