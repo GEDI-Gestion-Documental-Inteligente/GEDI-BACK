@@ -103,13 +103,13 @@ export const createAlfrescoNodes = async ({ ticket, nodeData, idNode }) => {
     const URL_HOST = process.env.URL_HOST
 
     const token = toConvertBase64(ticket)
-    const { name, title, description, nodeType, typeDocument } = nodeData
+    const { name, title, description, nodeType } = nodeData
     let bodyData = {
       name,
       nodeType
     }
     if (title && description) {
-      bodyData = { ...bodyData, properties: { 'cm:title': title, 'cm:description': description, 'cm:typeDocument': typeDocument } }
+      bodyData = { ...bodyData, properties: { 'cm:title': title, 'cm:description': description } }
     }
     // console.log(token);
     const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}/children`, {
@@ -262,6 +262,60 @@ export const updatePermissionsAlfrescoNode = async ({ ticket, nodeData, idNode }
     // console.log(token);
     const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}`, {
       method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${token}`
+      },
+      body: JSON.stringify(bodyData)
+    })
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// DELETE
+export const deleteAlfrescoNode = async ({ ticket, idNode }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+
+    const token = toConvertBase64(ticket)
+    // console.log(token);
+    const response = await fetch(
+              `http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}?permanent=true`,
+              {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Basic ${token}`
+                }
+              }
+    )
+    if (response.status === 204) {
+      return response
+    }
+    return response.json()
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// POST
+
+export const moveAlfrescoNode = async ({ ticket, idNode, targetId }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+
+    const token = toConvertBase64(ticket)
+    const bodyData = {
+      targetParentId: targetId
+    }
+    // console.log(token);
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}/move`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Basic ${token}`

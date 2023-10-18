@@ -1,10 +1,9 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { createFolder, getNodeContent, getNodeInfo, getNodeParents, getNodes, updateNode, updatePermissionsNode, updateTypeNode, uploadContent } from './nodes.service.js'
+import { createFolder, deleteNode, getNodeContent, getNodeInfo, getNodeParents, getNodes, moveNode, updateNode, updatePermissionsNode, updateTypeNode, uploadContent } from './nodes.service.js'
 const router = Router()
-
 // GET
-router.get('/:idNode', validarJwt, async (req, res) => {
+router.get('one-node/:idNode', validarJwt, async (req, res) => {
   try {
     // obtiene la información de un nodo
     const ticket = req.ticket
@@ -16,44 +15,8 @@ router.get('/:idNode', validarJwt, async (req, res) => {
   }
 })
 
-router.get('/:idNode/childrens', validarJwt, async (req, res) => {
-  try {
-    // obtiene la información de los hijos del nodo
-    const ticket = req.ticket
-    const idNode = req.params.idNode
-    const nodes = await getNodes({ ticket, idNode })
-    return res.status(nodes.status).json(nodes)
-  } catch (error) {
-    return res.status(500).json(error)
-  }
-})
-
-router.get('/:idNode/parents', validarJwt, async (req, res) => {
-  try {
-    // obtiene la información de los hijos del nodo
-    const ticket = req.ticket
-    const idNode = req.params.idNode
-    const parentNodes = await getNodeParents({ ticket, idNode })
-    return res.status(parentNodes.status).json(parentNodes)
-  } catch (error) {
-    return res.status(500).json(error)
-  }
-})
-
-router.get('/:idNode/content', validarJwt, async (req, res) => {
-  try {
-    // obtiene el contenido del nodo => sirve para archivos por ejemplo: pdf
-    const ticket = req.ticket
-    const idNode = req.params.idNode
-    const content = await getNodeContent({ ticket, idNode })
-    return res.status(content.status).json(content)
-  } catch (error) {
-    return res.status(500).json(error)
-  }
-})
-
 // POST
-router.post('/:idParent/create', validarJwt, async (req, res) => {
+router.post('/:idParent/create-folder', validarJwt, async (req, res) => {
   try {
   // crea un nodo a partir de un nombre del nodo y su tipo [folder,content]
   // tambien puede recibir como caracteristica interna un title y description
@@ -75,29 +38,8 @@ router.post('/:idParent/create', validarJwt, async (req, res) => {
   }
 })
 
-// PUT
-router.put('/update-permissions/:id', validarJwt, async (req, res) => {
-  try {
-    const { authorityId, name, accessStatus } = req.body
-    const ticket = req.ticket
-    const idNode = req.params.id
-    const updatedPermissions = await updatePermissionsNode({
-      ticket,
-      idNode,
-      nodeData: {
-        authorityId,
-        name,
-        accessStatus
-      }
-    })
-    return res.status(updatedPermissions.status).json(updatedPermissions)
-  } catch (error) {
-    return res.status(500).json(error)
-  }
-})
-
 // POST
-router.post('/:idParent/uploadContent', validarJwt, async (req, res) => {
+router.post('/:idParent/upload-content', validarJwt, async (req, res) => {
   try {
     const file = req.file
     const { name, title, description, typeDocument } = req.body
@@ -140,6 +82,76 @@ router.put('/update/:id', validarJwt, async (req, res) => {
     return res.status(500).json(error)
   }
 })
+// DELETE
+
+router.delete('/delete/:id', validarJwt, async (req, res) => {
+  try {
+    const ticket = req.ticket
+    const idNode = req.params.id
+    const deletedNode = await deleteNode({ ticket, idNode })
+    return res.status(deletedNode.status).json(deletedNode)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+// SERVICIOS ADICIONALES AL CRUD
+
+router.get('/:idNode/childrens', validarJwt, async (req, res) => {
+  try {
+    // obtiene la información de los hijos del nodo
+    const ticket = req.ticket
+    const idNode = req.params.idNode
+    const nodes = await getNodes({ ticket, idNode })
+    return res.status(nodes.status).json(nodes)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+router.get('/:idNode/parents', validarJwt, async (req, res) => {
+  try {
+    // obtiene la información de los hijos del nodo
+    const ticket = req.ticket
+    const idNode = req.params.idNode
+    const parentNodes = await getNodeParents({ ticket, idNode })
+    return res.status(parentNodes.status).json(parentNodes)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+router.get('/:idNode/content', validarJwt, async (req, res) => {
+  try {
+    // obtiene el contenido del nodo => sirve para archivos por ejemplo: pdf
+    const ticket = req.ticket
+    const idNode = req.params.idNode
+    const content = await getNodeContent({ ticket, idNode })
+    return res.status(content.status).json(content)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+// PUT
+router.put('/update-permissions/:id', validarJwt, async (req, res) => {
+  try {
+    const { authorityId, name, accessStatus } = req.body
+    const ticket = req.ticket
+    const idNode = req.params.id
+    const updatedPermissions = await updatePermissionsNode({
+      ticket,
+      idNode,
+      nodeData: {
+        authorityId,
+        name,
+        accessStatus
+      }
+    })
+    return res.status(updatedPermissions.status).json(updatedPermissions)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
 
 // PUT
 router.put('/update-type/:id', validarJwt, async (req, res) => {
@@ -160,4 +172,20 @@ router.put('/update-type/:id', validarJwt, async (req, res) => {
   }
 })
 
+// POST
+router.post('/move-node/:id', validarJwt, async (req, res) => {
+  try {
+    const { targetId } = req.body
+    const ticket = req.ticket
+    const idNode = req.params.id
+    const nodeMoved = await moveNode({
+      ticket,
+      idNode,
+      targetId
+    })
+    return res.status(nodeMoved.status).json(nodeMoved)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
 export default router

@@ -1,10 +1,12 @@
 import Node from '../../models/Node.js'
 import {
   createAlfrescoNodes,
+  deleteAlfrescoNode,
   getAlfrescoContent,
   getAlfrescoNodeInfo,
   getAlfrescoNodesChildrens,
   getAlfrescoNodesParents,
+  moveAlfrescoNode,
   updateAlfrescoNode,
   updatePermissionsAlfrescoNode,
   updateTypeAlfrescoNode,
@@ -149,8 +151,7 @@ export const createFolder = async ({ ticket, idNode, nodeData }) => {
         name,
         nodeType: 'cm:folder',
         title,
-        description,
-        typeDocument: 'Carpeta'
+        description
       }
     })
     if (alfrescoNodes.error) {
@@ -435,6 +436,74 @@ export const updateTypeNode = async ({ ticket, idNode, nodeData }) => {
       msg: 'Nodo actualizado correctamente',
       updatedTypeNode,
       updatedTypeNodeMongo
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const deleteNode = async ({ ticket, idNode }) => {
+  try {
+    const alfrescoNodeDeleted = await deleteAlfrescoNode({ ticket, idNode })
+    const mongoNodeDeleted = await Node.findOneAndDelete({ id: idNode })
+    if (alfrescoNodeDeleted.error) {
+      return {
+        ok: false,
+        status: alfrescoNodeDeleted.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: alfrescoNodeDeleted.error.errorKey
+
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Nodo eliminado correctamente',
+      mongoNodeDeleted
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const moveNode = async ({ ticket, idNode, targetId }) => {
+  try {
+    const alfrescoNodeMoved = await moveAlfrescoNode({ ticket, idNode, targetId })
+    const mongoNodeMoved = await Node.findOneAndUpdate(
+      { id: idNode },
+      {
+        $set: {
+          parentId: alfrescoNodeMoved.entry.parentId
+        }
+      },
+      { new: true }
+    )
+
+    if (alfrescoNodeMoved.error) {
+      return {
+        ok: false,
+        status: alfrescoNodeMoved.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: alfrescoNodeMoved.error.errorKey
+
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Nodo movido correctamente',
+      alfrescoNodeMoved,
+      mongoNodeMoved
     }
   } catch (error) {
     console.error('Error:', error.message)
