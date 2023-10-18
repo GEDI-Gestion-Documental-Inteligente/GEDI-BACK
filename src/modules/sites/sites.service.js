@@ -205,7 +205,7 @@ export const deleteSite = async ({ ticket, idSite }) => {
     }
     return {
       ok: true,
-      status: 204,
+      status: 200,
       msg: 'Sitio eliminado correctamente',
       mongoSiteDeleted
     }
