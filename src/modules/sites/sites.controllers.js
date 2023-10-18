@@ -14,7 +14,7 @@ router.get('/all', validarJwt, async (req, res) => {
   }
 })
 
-router.get('/:id', validarJwt, async (req, res) => {
+router.get('/one-site/:id', validarJwt, async (req, res) => {
   try {
     const ticket = req.ticket
     const idSite = req.params.id
@@ -173,7 +173,7 @@ router.delete('/delete-member/:id/:idPerson', validarJwt, async (req, res) => {
 })
 
 // ENDPOINTS AUXILIARES
-router.get('/getContainerSite/:siteName', validarJwt, async (req, res) => {
+router.get('/document-library/:siteName', validarJwt, async (req, res) => {
   const siteName = req.params.siteName
   const ticket = req.ticket
 
@@ -186,7 +186,7 @@ router.get('/getContainerSite/:siteName', validarJwt, async (req, res) => {
   }
 })
 
-router.get('/getMySites', validarJwt, async (req, res) => {
+router.get('/my-sites', validarJwt, async (req, res) => {
   const ticket = req.ticket
 
   try {
