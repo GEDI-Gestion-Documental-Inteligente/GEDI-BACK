@@ -1,8 +1,9 @@
 import { Router } from 'express'
 import { authLogin } from './auth.service.js'
+import { apiLimiter } from '../../middlewares/apiLimiter.js'
 const router = Router()
 
-router.post('/auth', async (req, res) => {
+router.post('/auth', apiLimiter, async (req, res) => {
   try {
     const { userId, password } = req.body
     const loginAlfresco = await authLogin({ userId, password })
