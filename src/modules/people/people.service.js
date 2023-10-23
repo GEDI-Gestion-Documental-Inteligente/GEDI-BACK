@@ -1,4 +1,4 @@
-import { getAlfrescoPeople, createAlfrescoPerson, getAlfrescoPeopleActivities } from './alfresco.people.service.js'
+import { getAlfrescoPeople, createAlfrescoPerson, getAlfrescoPeopleActivities, getAlfrescoOnePerson, updateAlfrescoPerson, manageAlfrescoPersonStatus, createAlfrescoMemberRequest, deleteAlfrescoMemberRequest } from './alfresco.people.service.js'
 import Person from '../../models/Person.js'
 
 export const getPeople = async ({ ticket }) => {
@@ -18,7 +18,7 @@ export const getPeople = async ({ ticket }) => {
     return {
       ok: true,
       status: 200,
-      msg: 'people:',
+      msg: 'People:',
       people,
       mongoPeople
     }
@@ -27,7 +27,38 @@ export const getPeople = async ({ ticket }) => {
     return {
       ok: false,
       status: 500,
-      msg: 'Error al obtener la persona y crearla en Mongoose'
+      msg: 'Hubo un error en el servidor'
+    }
+  }
+}
+
+export const getOnePerson = async ({ ticket, idPerson }) => {
+  try {
+    const person = await getAlfrescoOnePerson({ ticket, idPerson })
+    const mongoPerson = await Person.findOne({ id: idPerson })
+
+    if (person.error) {
+      return {
+        ok: false,
+        status: person.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: person.error.errorKey
+      }
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Person:',
+      person,
+      mongoPerson
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Hubo un error en el servidor'
     }
   }
 }
@@ -86,6 +117,175 @@ export const createPerson = async ({ ticket, personData }) => {
       ok: false,
       status: 500,
       msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const updatePerson = async ({ ticket, personData, idPerson }) => {
+  try {
+    const { firstName, lastName, email, skypeId, jobTitle } =
+            personData
+
+    // Validar los datos de entrada
+    if (!firstName || !lastName || !email) {
+      return {
+        ok: false,
+        status: 400,
+        msg: 'Faltan campos requeridos'
+      }
+    }
+
+    // Crear la persona en Alfresco
+    const updatedAlfrescoPerson = await updateAlfrescoPerson({
+      ticket,
+      idPerson,
+      personData: {
+        firstName,
+        lastName,
+        email,
+        skypeId,
+        jobTitle
+      }
+    })
+
+    if (updatedAlfrescoPerson.error) {
+      return {
+        ok: false,
+        status: updatedAlfrescoPerson.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: updatedAlfrescoPerson.error.errorKey
+      }
+    }
+    // SI ves este comentario significa que esto todavia no esta probado si anda
+    const updatedMongoPerson = await Person.findOneAndUpdate(
+      { id: idPerson },
+      {
+        $set: {
+          ...updatedAlfrescoPerson.entry
+        }
+      },
+      { new: true }
+    )
+
+    return {
+      ok: true,
+      status: 201,
+      msg: 'Persona actualizada correctamente',
+      updatedAlfrescoPerson,
+      updatedMongoPerson
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const managePersonStatus = async ({ ticket, idPerson, personData }) => {
+  try {
+    const { enabled } = personData
+    const deletedPerson = await manageAlfrescoPersonStatus({
+      ticket,
+      idPerson,
+      personData: {
+        enabled
+      }
+    })
+    const deletedMongoPerson = await Person.findOneAndDelete({ id: idPerson })
+
+    if (deletedPerson.error) {
+      return {
+        ok: false,
+        status: deletedPerson.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: deletedPerson.error.errorKey
+      }
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Estado cambiado correctamente',
+      deletedPerson,
+      deletedMongoPerson
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Hubo un error en el servidor'
+    }
+  }
+}
+
+export const createMemberRequest = async ({ ticket, requestData }) => {
+  try {
+    const { message, id, title } = requestData
+    const memberRequest = await createAlfrescoMemberRequest({
+      ticket,
+      requestData: {
+        message,
+        id,
+        title
+      }
+    })
+
+    if (memberRequest.error) {
+      return {
+        ok: false,
+        status: memberRequest.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: memberRequest.error.errorKey
+      }
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Solicitud realizada correctamente',
+      memberRequest
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Hubo un error en el servidor'
+    }
+  }
+}
+
+export const deleteMemberRequest = async ({ ticket, siteId }) => {
+  try {
+    const deletedMemberRequest = await deleteAlfrescoMemberRequest({
+      ticket,
+      siteId
+    })
+
+    if (deletedMemberRequest.error) {
+      return {
+        ok: false,
+        status: deletedMemberRequest.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: deletedMemberRequest.error.errorKey
+      }
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      msg: 'Solicitud eliminada correctamente'
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Hubo un error en el servidor'
     }
   }
 }
