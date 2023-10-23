@@ -1,4 +1,4 @@
-import { alfrescoSearchNodes, alfrescoSearchWithTerm } from './alfresco.queries.service.js'
+import { alfrescoSearchNodes, alfrescoSearchPeople, alfrescoSearchSites, alfrescoSearchWithTerm } from './alfresco.queries.service.js'
 
 export const sendQueriesWithTerm = async ({ ticket, term }) => {
   try {
@@ -60,7 +60,7 @@ export const sendQueriesForNodes = async ({ ticket, term, root }) => {
 
 export const sendQueriesForSites = async ({ ticket, term }) => {
   try {
-    const resultQuery = await alfrescoSearchNodes({ ticket, term })
+    const resultQuery = await alfrescoSearchSites({ ticket, term })
 
     if (resultQuery.error) {
       return {
@@ -89,7 +89,7 @@ export const sendQueriesForSites = async ({ ticket, term }) => {
 
 export const sendQueriesForPeople = async ({ ticket, term }) => {
   try {
-    const resultQuery = await alfrescoSearchNodes({ ticket, term })
+    const resultQuery = await alfrescoSearchPeople({ ticket, term })
 
     if (resultQuery.error) {
       return {

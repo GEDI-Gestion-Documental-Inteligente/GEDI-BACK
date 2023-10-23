@@ -80,7 +80,7 @@ export const alfrescoSearchSites = async ({ ticket, term }) => {
   const token = toConvertBase64(ticket)
 
   try {
-    const termQuery = term.term
+    const termQuery = encodeURIComponent(term)
     const response = await fetch(
       `http://${URL_HOST}:8080/${URL_CORE_API}/queries/sites?term=${termQuery}*`,
       {
@@ -106,7 +106,7 @@ export const alfrescoSearchPeople = async ({ ticket, term }) => {
   const token = toConvertBase64(ticket)
 
   try {
-    const termQuery = term.term
+    const termQuery = encodeURIComponent(term)
     const response = await fetch(
       `http://${URL_HOST}:8080/${URL_CORE_API}/queries/people?term=${termQuery}*`,
       {
