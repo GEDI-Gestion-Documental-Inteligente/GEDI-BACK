@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { createMemberRequest, createPerson, deleteMemberRequest, getOnePerson, getPeople, getPeopleActivities, managePersonStatus, updatePerson } from './people.service.js'
+import { createMemberRequest, createPerson, deleteMemberRequest, getOnePerson, getPeople, getPeopleActivities, managePersonStatus, updatePassword, updatePerson } from './people.service.js'
 const router = Router()
 // GET
 router.get('/all-people', validarJwt, async (req, res) => {
@@ -55,6 +55,25 @@ router.put('/update/:id', validarJwt, async (req, res) => {
       }
     })
     return res.status(updatedPerson.status).json(updatedPerson)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+router.put('/change-password/:id', validarJwt, async (req, res) => {
+  try {
+    const { oldPassword, password } = req.body
+    console.log(req.body)
+    const ticket = req.ticket
+    const idPerson = req.params.id
+    const updatedPassword = await updatePassword({
+      ticket,
+      idPerson,
+      personData: {
+        oldPassword, password
+      }
+    })
+    return res.status(updatedPassword.status).json(updatedPassword)
   } catch (error) {
     return res.status(500).json(error)
   }

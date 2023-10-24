@@ -1,4 +1,4 @@
-import { getAlfrescoPeople, createAlfrescoPerson, getAlfrescoPeopleActivities, getAlfrescoOnePerson, updateAlfrescoPerson, manageAlfrescoPersonStatus, createAlfrescoMemberRequest, deleteAlfrescoMemberRequest } from './alfresco.people.service.js'
+import { getAlfrescoPeople, createAlfrescoPerson, getAlfrescoPeopleActivities, getAlfrescoOnePerson, updateAlfrescoPerson, manageAlfrescoPersonStatus, createAlfrescoMemberRequest, deleteAlfrescoMemberRequest, updatePassAlfrescoPerson } from './alfresco.people.service.js'
 import Person from '../../models/Person.js'
 
 export const getPeople = async ({ ticket }) => {
@@ -173,6 +173,66 @@ export const updatePerson = async ({ ticket, personData, idPerson }) => {
       msg: 'Persona actualizada correctamente',
       updatedAlfrescoPerson,
       updatedMongoPerson
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const updatePassword = async ({ ticket, personData, idPerson }) => {
+  try {
+    const { oldPassword, password } =
+            personData
+
+    // Validar los datos de entrada
+    if (!oldPassword || !password) {
+      return {
+        ok: false,
+        status: 400,
+        msg: 'Faltan campos requeridos'
+      }
+    }
+
+    // Crear la persona en Alfresco
+    const updatedPassword = await updatePassAlfrescoPerson({
+      ticket,
+      idPerson,
+      personData: {
+        oldPassword,
+        password
+      }
+    })
+
+    if (updatedPassword.error) {
+      return {
+        ok: false,
+        status: updatedPassword.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: updatedPassword.error.errorKey
+      }
+    }
+    // SI ves este comentario significa que esto todavia no esta probado si anda
+    const updatedMongoPassword = await Person.findOneAndUpdate(
+      { id: idPerson },
+      {
+        $set: {
+          ...updatedPassword.entry, password
+        }
+      },
+      { new: true }
+    )
+
+    return {
+      ok: true,
+      status: 201,
+      msg: 'Contraseña actualizada correctamente',
+      updatedPassword,
+      updatedMongoPassword
     }
   } catch (error) {
     console.error('Error:', error.message)
