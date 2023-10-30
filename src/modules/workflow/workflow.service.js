@@ -1,14 +1,20 @@
 import WorkFlow from '../../models/WorkFlow.js'
 import Task from '../../models/Task.js'
-import { addAlfrescoWorkFlowItems, createAlfrescoWorkFlow, getAlfrescoWorkFlowTasks } from './alfresco.workflow.service.js'
+import {
+  addAlfrescoWorkFlowItems,
+  createAlfrescoWorkFlow,
+  getAlfrescoWorkFlowTasks
+} from './alfresco.workflow.service.js'
 export const createWorkFlow = async ({ ticket, nodeData }) => {
   try {
-    const { assignee, message, expirationDate, priority } = nodeData
+    const { assignee, message, expirationDate, priority, emailNotif } = nodeData
 
     // validar que no llegen campos vacios
 
-    const process = await createAlfrescoWorkFlow({ ticket, nodeData: { assignee, message, expirationDate, priority } })
-
+    const process = await createAlfrescoWorkFlow({
+      ticket,
+      nodeData: { assignee, message, expirationDate, priority, emailNotif }
+    })
     if (process.error) {
       return {
         ok: false,
@@ -16,6 +22,9 @@ export const createWorkFlow = async ({ ticket, nodeData }) => {
         msg: 'Hubo un error en alfresco',
         error: process.error.errorKey
       }
+    }
+    if (process.ok === false) {
+      return process
     }
     const idWorkFlow = process.entry.id
     const processTasks = await getAlfrescoWorkFlowTasks({ ticket, idWorkFlow })
@@ -37,7 +46,7 @@ export const createWorkFlow = async ({ ticket, nodeData }) => {
       expirationDate: tasks.dueAt,
       idProcess: tasks.processId,
       name: 'Nueva Tarea',
-      description: 'Nueva Tarea Iniciada por el usuario ' + process.entry.startUserId,
+      description: `Nueva Tarea Iniciada por el usuario ${process.entry.startUserId}`,
       startedAt: tasks.startedAt,
       id: tasks.id,
       assignee: tasks.assignee,
