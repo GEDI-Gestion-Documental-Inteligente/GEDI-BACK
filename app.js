@@ -48,7 +48,7 @@ app.use('/api/groups', Groups)
 app.use('/api/workflow', WorkFlows)
 
 // Not Found Routes
-app.use((req, res) => res.send(`<p>La ruta no válida: <strong>${req.url}</strong></p>`))
+app.use((req, res) => res.status(401).send(`<p>La ruta no válida: <strong>${req.url}</strong></p>`))
 
 // Server on listen
 app.listen(port, () => console.log(`server on http://localhost:${port}`))
