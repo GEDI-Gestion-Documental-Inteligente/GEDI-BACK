@@ -271,3 +271,28 @@ export const getAlfrescoPeopleActivities = async ({ ticket, userId }) => {
     console.log(error)
   }
 }
+
+export const getAlfrescoActivitiesOneSite = async ({ ticket, siteId }) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
+
+    const token = toConvertBase64(ticket)
+
+    const response = await fetch(
+              `http://${URL_HOST}:8080/${URL_CORE_API}/people/-me-/activities?siteId=${siteId}`,
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Basic ${token}`
+                }
+              }
+    )
+    const data = await response.json()
+    console.log(data)
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}

@@ -1,4 +1,15 @@
-import { getAlfrescoPeople, createAlfrescoPerson, getAlfrescoPeopleActivities, getAlfrescoOnePerson, updateAlfrescoPerson, manageAlfrescoPersonStatus, createAlfrescoMemberRequest, deleteAlfrescoMemberRequest, updatePassAlfrescoPerson } from './alfresco.people.service.js'
+import {
+  getAlfrescoPeople,
+  createAlfrescoPerson,
+  getAlfrescoPeopleActivities,
+  getAlfrescoOnePerson,
+  updateAlfrescoPerson,
+  manageAlfrescoPersonStatus,
+  createAlfrescoMemberRequest,
+  deleteAlfrescoMemberRequest,
+  updatePassAlfrescoPerson,
+  getAlfrescoActivitiesOneSite
+} from './alfresco.people.service.js'
 import Person from '../../models/Person.js'
 
 export const getPeople = async ({ ticket }) => {
@@ -66,7 +77,7 @@ export const getOnePerson = async ({ ticket, idPerson }) => {
 export const createPerson = async ({ ticket, personData }) => {
   try {
     const { id, firstName, lastName, email, password, skypeId, jobTitle } =
-            personData
+      personData
 
     // Validar los datos de entrada
     if (!id || !firstName || !lastName || !email || !password) {
@@ -123,8 +134,7 @@ export const createPerson = async ({ ticket, personData }) => {
 
 export const updatePerson = async ({ ticket, personData, idPerson }) => {
   try {
-    const { firstName, lastName, email, skypeId, jobTitle } =
-            personData
+    const { firstName, lastName, email, skypeId, jobTitle } = personData
 
     // Validar los datos de entrada
     if (!firstName || !lastName || !email) {
@@ -186,8 +196,7 @@ export const updatePerson = async ({ ticket, personData, idPerson }) => {
 
 export const updatePassword = async ({ ticket, personData, idPerson }) => {
   try {
-    const { oldPassword, password } =
-            personData
+    const { oldPassword, password } = personData
 
     // Validar los datos de entrada
     if (!oldPassword || !password) {
@@ -221,7 +230,8 @@ export const updatePassword = async ({ ticket, personData, idPerson }) => {
       { id: idPerson },
       {
         $set: {
-          ...updatedPassword.entry, password
+          ...updatedPassword.entry,
+          password
         }
       },
       { new: true }
@@ -353,34 +363,75 @@ export const deleteMemberRequest = async ({ ticket, siteId }) => {
 export const getPeopleActivities = async ({ ticket, userId }) => {
   try {
     if (!userId) {
-      return ({
+      return {
         ok: false,
         status: 400,
         msg: 'Faltan datos requeridos'
-      })
+      }
     }
 
-    const peopleActivities = await getAlfrescoPeopleActivities({ ticket, userId })
+    const peopleActivities = await getAlfrescoPeopleActivities({
+      ticket,
+      userId
+    })
 
     if (peopleActivities.error) {
-      return ({
+      return {
         ok: false,
         status: peopleActivities.error.statusCode,
         msg: 'Hubo un error en alfresco',
         error: peopleActivities.error.errorKey
-      })
+      }
     }
 
-    return ({
+    return {
       ok: true,
       status: 201,
       peopleActivities
-    })
+    }
   } catch (error) {
-    return ({
+    return {
       ok: false,
       status: 500,
       msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const getActivitiesOneSite = async ({ ticket, siteId }) => {
+  try {
+    if (!siteId) {
+      return {
+        ok: false,
+        status: 400,
+        msg: 'Faltan datos requeridos'
+      }
+    }
+
+    const siteActivities = await getAlfrescoActivitiesOneSite({
+      ticket,
+      siteId
     })
+
+    if (siteActivities.error) {
+      return {
+        ok: false,
+        status: siteActivities.error.statusCode,
+        msg: 'Hubo un error en alfresco',
+        error: siteActivities.error.errorKey
+      }
+    }
+
+    return {
+      ok: true,
+      status: 201,
+      siteActivities
+    }
+  } catch (error) {
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
   }
 }
