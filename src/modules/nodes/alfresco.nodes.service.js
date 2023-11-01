@@ -74,14 +74,15 @@ export const getAlfrescoNodeInfo = async ({ ticket, idNode }) => {
 
 // GET CONTENT ALFRESCO (POSIBLE DOWNLOAD?)
 
-export const getAlfrescoContent = async ({ ticket, idNode }) => {
+export const getAlfrescoContent = async ({ ticket, idCreatedContent }) => {
   try {
     const URL_CORE_API = process.env.URL_CORE_API
     const URL_HOST = process.env.URL_HOST
+    console.log(idCreatedContent)
 
     const token = toConvertBase64(ticket)
     console.log(token)
-    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}/content`, {
+    const response = await fetch(`http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idCreatedContent}/content`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
