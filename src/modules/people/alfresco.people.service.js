@@ -121,6 +121,39 @@ export const updateAlfrescoPerson = async ({ ticket, idPerson, personData }) => 
 }
 
 // PUT
+export const updatePassAlfrescoPerson = async ({ ticket, idPerson, personData }) => {
+  const URL_CORE_API = process.env.URL_CORE_API
+  const URL_HOST = process.env.URL_HOST
+  try {
+    const token = toConvertBase64(ticket)
+    const { oldPassword, password } =
+              personData
+    const bodyData = {
+      oldPassword,
+      password
+    }
+    // Enviar la persona a Alfresco
+    const response = await fetch(
+              `http://${URL_HOST}:8080/${URL_CORE_API}/people/${idPerson}`,
+              {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Basic ${token}`
+                },
+                body: JSON.stringify(bodyData) // Enviar los datos de la persona a Alfresco
+              }
+    )
+
+    const data = await response.json()
+
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// PUT
 export const manageAlfrescoPersonStatus = async ({ ticket, idPerson, personData }) => {
   const URL_CORE_API = process.env.URL_CORE_API
   const URL_HOST = process.env.URL_HOST
