@@ -274,7 +274,7 @@ export const uploadContent = async ({ ticket, idNode, nodeData, file }) => {
     }
     const idCreatedContent = alfrescoContent.entry.id
     const nodeContent = await getAlfrescoContent({ ticket, idCreatedContent })
-    console.log(nodeContent)
+    console.log(idCreatedContent)
     console.log(alfrescoContent.entry.createdByUser)
     const newNode = new Node({
       createdByUser: alfrescoContent.entry.createdByUser,
