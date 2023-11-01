@@ -31,7 +31,7 @@ router.get('/searchNodes', validarJwt, async (req, res) => {
 
 router.get('/searchSites', validarJwt, async (req, res) => {
   const ticket = req.ticket
-  const term = req.query
+  const { term } = req.query
 
   try {
     const resultQuery = await sendQueriesForSites({ ticket, term })
