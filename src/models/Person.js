@@ -26,11 +26,11 @@ const personSchema = new mongoose.Schema(
     },
     skypeId: {
       type: String,
-      required: true
+      required: false
     },
     jobTitle: {
       type: String,
-      required: true
+      required: false
     }
   },
   {
