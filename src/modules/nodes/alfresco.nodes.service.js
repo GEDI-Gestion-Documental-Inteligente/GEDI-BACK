@@ -164,11 +164,6 @@ export const uploadAlfrescoContent = async ({ ticket, nodeData, idNode, file }) 
     })
 
     const data = await response.json()
-    fs.unlink(`${file.path}`, (error) => {
-      if (error) {
-        console.error(error)
-      }
-    })
     return data
   } catch (error) {
     console.log(error)
