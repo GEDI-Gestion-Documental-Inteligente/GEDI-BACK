@@ -272,9 +272,6 @@ export const uploadContent = async ({ ticket, idNode, nodeData, file }) => {
         error: alfrescoContent.error.errorKey
       }
     }
-    const idCreatedContent = alfrescoContent.entry.id
-    const nodeContent = await getAlfrescoContent({ ticket, idCreatedContent })
-    console.log(idCreatedContent)
     console.log(alfrescoContent.entry.createdByUser)
     const newNode = new Node({
       createdByUser: alfrescoContent.entry.createdByUser,
@@ -283,7 +280,7 @@ export const uploadContent = async ({ ticket, idNode, nodeData, file }) => {
       parentId: alfrescoContent.entry.parentId,
       id: alfrescoContent.entry.id,
       properties: { ...alfrescoContent.entry.content, ...alfrescoContent.entry.properties },
-      buffer: nodeContent
+      path: `/${file.filename}`
     })
 
     const mongoNode = await newNode.save()

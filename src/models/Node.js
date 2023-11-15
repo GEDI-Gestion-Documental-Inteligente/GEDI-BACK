@@ -25,9 +25,9 @@ const NodeSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
-  buffer: {
-    type: Buffer,
-    required: false
+  path: {
+    type: String,
+    required: true
   }
 
 },

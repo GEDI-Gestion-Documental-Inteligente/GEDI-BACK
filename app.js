@@ -25,14 +25,14 @@ const storage = multer.diskStorage({
   destination: path.join('./uploads'),
   filename: (req, file, cb) => {
     cb(null, new Date().getTime() + path.extname(file.originalname))
-  },
+  }
 })
 
 const upload = multer({ storage })
-
 // Middlewares
 app.use(upload.single('filedata'))
 app.use(express.json())
+app.use(express.static('uploads'))
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 app.use(morgan('dev'))
@@ -47,12 +47,12 @@ app.use('/api/workflow', WorkFlows)
 
 // Not Found Routes
 app.use((req, res) =>
-  res.status(401).send(`<p>La ruta no válida: <strong>${req.url}</strong></p>`),
+  res.status(401).send(`<p>La ruta no válida: <strong>${req.url}</strong></p>`)
 )
 
 // Server on listen
 verifConnAlfresco().then((connAlfresco) => {
-  app.listen(port, async() => {
+  app.listen(port, async () => {
     // Connect to DB
     connectDB()
     console.log(connAlfresco)
