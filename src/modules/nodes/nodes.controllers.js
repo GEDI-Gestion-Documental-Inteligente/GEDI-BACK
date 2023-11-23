@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { createFolder, deleteNode, getNodeContent, getNodeInfo, getNodeParents, getNodes, moveNode, updateNode, updatePermissionsNode, updateTypeNode, uploadContent } from './nodes.service.js'
+import { createFolder, deleteNode, getNodeContent, getNodeInfo, getNodeParents, getNodeTypes, getNodes, moveNode, updateNode, updatePermissionsNode, updateTypeNode, uploadContent } from './nodes.service.js'
 const router = Router()
 // GET
 router.get('one-node/:idNode', validarJwt, async (req, res) => {
@@ -184,6 +184,18 @@ router.post('/move-node/:id', validarJwt, async (req, res) => {
       targetId
     })
     return res.status(nodeMoved.status).json(nodeMoved)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+router.get('/types', validarJwt, async (req, res) => {
+  try {
+    // obtiene la información de un nodo
+    const ticket = req.ticket
+
+    const types = await getNodeTypes({ ticket })
+    return res.status(types.status).json(types)
   } catch (error) {
     return res.status(500).json(error)
   }

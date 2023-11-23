@@ -4,6 +4,7 @@ import {
   deleteAlfrescoNode,
   getAlfrescoContent,
   getAlfrescoNodeInfo,
+  getAlfrescoNodeTypes,
   getAlfrescoNodesChildrens,
   getAlfrescoNodesParents,
   moveAlfrescoNode,
@@ -169,7 +170,7 @@ export const createFolder = async ({ ticket, idNode, nodeData }) => {
       parentId: alfrescoNodes.entry.parentId,
       id: alfrescoNodes.entry.id,
       properties: alfrescoNodes.entry.properties,
-      buffer: null
+      path: null
     })
 
     const mongoNode = await newNode.save()
@@ -508,6 +509,36 @@ export const moveNode = async ({ ticket, idNode, targetId }) => {
       ok: false,
       status: 500,
       msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const getNodeTypes = async ({ ticket }) => {
+  try {
+    const nodeTypes = await getAlfrescoNodeTypes({ ticket })
+
+    if (nodeTypes.error) {
+      return {
+        ok: false,
+        status: nodeTypes.error.statusCode,
+        msg: 'Hubo un error en alfresco.',
+        error: nodeTypes.error.errorKey
+      }
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      msg: 'nodeTypes:',
+      nodeTypes
+
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Ocurrio un error en el servidor.'
     }
   }
 }
