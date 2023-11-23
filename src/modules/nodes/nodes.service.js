@@ -17,7 +17,7 @@ import {
 export const getNodes = async ({ ticket, idNode }) => {
   try {
     const nodes = await getAlfrescoNodesChildrens({ ticket, idNode })
-    const nodesMongo = await Node.find()
+    const nodesMongo = await Node.find({ parentId: idNode })
 
     if (nodes.error) {
       return {
