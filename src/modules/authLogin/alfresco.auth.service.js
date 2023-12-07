@@ -5,13 +5,6 @@ export const getAlfrescoTicket = async ({ userId, password }) => {
   const URL_HOST = process.env.URL_HOST
 
   try {
-    if (!userId || !password) {
-      return {
-        ok: false,
-        msg: 'Faltan datos',
-        param: !userId ? 'userId' : 'password'
-      }
-    }
     const response = await fetch(`http://${URL_HOST}:8080/${URL_AUTH_API}/tickets`, {
       method: 'POST',
       'Content-Type': 'application/json',
