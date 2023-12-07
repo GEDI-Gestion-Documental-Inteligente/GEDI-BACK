@@ -1,10 +1,15 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { sendQueriesForNodes, sendQueriesForPeople, sendQueriesForSites, sendQueriesWithTerm } from './queries.services.js'
+import {
+  sendQueriesForNodes,
+  sendQueriesForPeople,
+  sendQueriesForSites,
+  sendQueriesWithTerm,
+} from './queries.service.js'
 
 const router = Router()
 
-router.post('/searchWithTerm', validarJwt, async (req, res) => {
+router.post('/searchWithTerm', validarJwt, async(req, res) => {
   const ticket = req.ticket
   const term = req.body
 
@@ -16,7 +21,7 @@ router.post('/searchWithTerm', validarJwt, async (req, res) => {
   }
 })
 
-router.get('/searchNodes', validarJwt, async (req, res) => {
+router.get('/searchNodes', validarJwt, async(req, res) => {
   const ticket = req.ticket
   const { term } = req.query
   const { root } = req.query
@@ -29,7 +34,7 @@ router.get('/searchNodes', validarJwt, async (req, res) => {
   }
 })
 
-router.get('/searchSites', validarJwt, async (req, res) => {
+router.get('/searchSites', validarJwt, async(req, res) => {
   const ticket = req.ticket
   const { term } = req.query
 
@@ -41,7 +46,7 @@ router.get('/searchSites', validarJwt, async (req, res) => {
   }
 })
 
-router.get('/searchPeople', validarJwt, async (req, res) => {
+router.get('/searchPeople', validarJwt, async(req, res) => {
   const ticket = req.ticket
   const { term } = req.query
 
