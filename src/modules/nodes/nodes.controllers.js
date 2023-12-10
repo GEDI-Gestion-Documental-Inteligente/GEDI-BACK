@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { createFolder, deleteNode, getNodeContent, getNodeInfo, getNodeParents, getNodeTypes, getNodes, moveNode, updateNode, updatePermissionsNode, updateTypeNode, uploadContent } from './nodes.service.js'
+import { createFolder, deleteNode, getNodeContent, getNodeInfo, getNodeParents, getNodeTypes, getNodes, moveNode, revertPermissionsNode, updateNode, updatePermissionsNode, updateTypeNode, uploadContent } from './nodes.service.js'
 const router = Router()
 // GET
 router.get('one-node/:idNode', validarJwt, async (req, res) => {
@@ -139,6 +139,26 @@ router.put('/update-permissions/:id', validarJwt, async (req, res) => {
     const ticket = req.ticket
     const idNode = req.params.id
     const updatedPermissions = await updatePermissionsNode({
+      ticket,
+      idNode,
+      nodeData: {
+        authorityId,
+        name,
+        accessStatus
+      }
+    })
+    return res.status(updatedPermissions.status).json(updatedPermissions)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+})
+
+router.put('/revert-permissions/:id', validarJwt, async (req, res) => {
+  try {
+    const { authorityId, name, accessStatus } = req.body
+    const ticket = req.ticket
+    const idNode = req.params.id
+    const updatedPermissions = await revertPermissionsNode({
       ticket,
       idNode,
       nodeData: {

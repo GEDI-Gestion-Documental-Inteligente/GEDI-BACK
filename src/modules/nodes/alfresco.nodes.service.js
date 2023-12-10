@@ -308,7 +308,47 @@ export const updatePermissionsAlfrescoNode = async ({
     console.log(error)
   }
 }
+export const revertPermissionsAlfrescoNode = async ({
+  ticket,
+  nodeData,
+  idNode
+}) => {
+  try {
+    const URL_CORE_API = process.env.URL_CORE_API
+    const URL_HOST = process.env.URL_HOST
 
+    const token = toConvertBase64(ticket)
+    const { authorityId, name, accessStatus } = nodeData
+
+    const bodyData = {
+      permissions: {
+        isInheritanceEnabled: true,
+        locallySet:
+          {
+            authorityId,
+            name,
+            accessStatus
+          }
+      }
+    }
+    // console.log(token);
+    const response = await fetch(
+      `http://${URL_HOST}:8080/${URL_CORE_API}/nodes/${idNode}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${token}`
+        },
+        body: JSON.stringify(bodyData)
+      }
+    )
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
 // DELETE
 export const deleteAlfrescoNode = async ({ ticket, idNode }) => {
   try {

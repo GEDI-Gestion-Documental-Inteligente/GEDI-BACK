@@ -8,6 +8,7 @@ import {
   getAlfrescoNodesChildrens,
   getAlfrescoNodesParents,
   moveAlfrescoNode,
+  revertPermissionsAlfrescoNode,
   updateAlfrescoNode,
   updatePermissionsAlfrescoNode,
   updateTypeAlfrescoNode,
@@ -229,7 +230,59 @@ export const updatePermissionsNode = async ({ ticket, idNode, nodeData }) => {
     }
     return {
       ok: true,
-      status: 201,
+      status: 200,
+      msg: 'Permisos actualizados correctamente',
+      changedPermissions
+    }
+  } catch (error) {
+    console.error('Error:', error.message)
+    return {
+      ok: false,
+      status: 500,
+      msg: 'Error al procesar la solicitud'
+    }
+  }
+}
+
+export const revertPermissionsNode = async ({ ticket, idNode, nodeData }) => {
+  try {
+    const { authorityId, name, accessStatus } = nodeData
+    if (!idNode) {
+      return {
+        ok: false,
+        status: 403,
+        msg: 'Se requiere id del nodo'
+      }
+    }
+
+    if (!authorityId || !name || !accessStatus) {
+      return {
+        ok: false,
+        status: 400,
+        msg: 'Los campos obligatorios son requeridos'
+      }
+    }
+    // Crear el sitio en Alfresco
+    const changedPermissions = await revertPermissionsAlfrescoNode({
+      ticket,
+      idNode,
+      nodeData: {
+        authorityId,
+        name,
+        accessStatus
+      }
+    })
+    if (changedPermissions.error) {
+      return {
+        ok: false,
+        status: changedPermissions.error.statusCode,
+        msg: 'Hubo un error en Alfresco.',
+        error: changedPermissions.error.errorKey
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
       msg: 'Permisos actualizados correctamente',
       changedPermissions
     }
