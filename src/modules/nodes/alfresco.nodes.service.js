@@ -282,13 +282,12 @@ export const updatePermissionsAlfrescoNode = async ({
     const bodyData = {
       permissions: {
         isInheritanceEnabled: false,
-        locallySet: [
+        locallySet:
           {
             authorityId,
             name,
             accessStatus
           }
-        ]
       }
     }
     // console.log(token);
