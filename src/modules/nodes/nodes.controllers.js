@@ -1,9 +1,23 @@
 import { Router } from 'express'
 import { validarJwt } from '../../helpers/validar-jwt.js'
-import { createFolder, deleteNode, getNodeContent, getNodeInfo, getNodeParents, getNodeTypes, getNodes, moveNode, revertPermissionsNode, updateNode, updatePermissionsNode, updateTypeNode, uploadContent } from './nodes.service.js'
+import {
+  createFolder,
+  deleteNode,
+  getNodeContent,
+  getNodeInfo,
+  getNodeParents,
+  getNodeTypes,
+  getNodes,
+  moveNode,
+  revertPermissionsNode,
+  updateNode,
+  updatePermissionsNode,
+  updateTypeNode,
+  uploadContent,
+} from './nodes.service.js'
 const router = Router()
 // GET
-router.get('one-node/:idNode', validarJwt, async (req, res) => {
+router.get('/one-node/:idNode', validarJwt, async(req, res) => {
   try {
     // obtiene la información de un nodo
     const ticket = req.ticket
@@ -16,10 +30,10 @@ router.get('one-node/:idNode', validarJwt, async (req, res) => {
 })
 
 // POST
-router.post('/:idParent/create-folder', validarJwt, async (req, res) => {
+router.post('/:idParent/create-folder', validarJwt, async(req, res) => {
   try {
-  // crea un nodo a partir de un nombre del nodo y su tipo [folder,content]
-  // tambien puede recibir como caracteristica interna un title y description
+    // crea un nodo a partir de un nombre del nodo y su tipo [folder,content]
+    // tambien puede recibir como caracteristica interna un title y description
     const { name, title, description } = req.body
     const ticket = req.ticket
     const idNode = req.params.idParent
@@ -29,8 +43,8 @@ router.post('/:idParent/create-folder', validarJwt, async (req, res) => {
       nodeData: {
         name,
         title,
-        description
-      }
+        description,
+      },
     })
     return res.status(person.status).json(person)
   } catch (error) {
@@ -39,7 +53,7 @@ router.post('/:idParent/create-folder', validarJwt, async (req, res) => {
 })
 
 // POST
-router.post('/:idParent/upload-content', validarJwt, async (req, res) => {
+router.post('/:idParent/upload-content', validarJwt, async(req, res) => {
   try {
     const file = req.file
     const { name, title, description, typeDocument } = req.body
@@ -53,8 +67,8 @@ router.post('/:idParent/upload-content', validarJwt, async (req, res) => {
         name,
         title,
         description,
-        typeDocument
-      }
+        typeDocument,
+      },
     })
     return res.status(content.status).json(content)
   } catch (error) {
@@ -63,7 +77,7 @@ router.post('/:idParent/upload-content', validarJwt, async (req, res) => {
 })
 
 // PUT
-router.put('/update/:id', validarJwt, async (req, res) => {
+router.put('/update/:id', validarJwt, async(req, res) => {
   try {
     const { name, title, description } = req.body
     const ticket = req.ticket
@@ -74,8 +88,8 @@ router.put('/update/:id', validarJwt, async (req, res) => {
       nodeData: {
         name,
         title,
-        description
-      }
+        description,
+      },
     })
     return res.status(updatedNode.status).json(updatedNode)
   } catch (error) {
@@ -84,7 +98,7 @@ router.put('/update/:id', validarJwt, async (req, res) => {
 })
 // DELETE
 
-router.delete('/delete/:id', validarJwt, async (req, res) => {
+router.delete('/delete/:id', validarJwt, async(req, res) => {
   try {
     const ticket = req.ticket
     const idNode = req.params.id
@@ -96,7 +110,7 @@ router.delete('/delete/:id', validarJwt, async (req, res) => {
 })
 // SERVICIOS ADICIONALES AL CRUD
 
-router.get('/:idNode/childrens', validarJwt, async (req, res) => {
+router.get('/:idNode/childrens', validarJwt, async(req, res) => {
   try {
     // obtiene la información de los hijos del nodo
     const ticket = req.ticket
@@ -108,7 +122,7 @@ router.get('/:idNode/childrens', validarJwt, async (req, res) => {
   }
 })
 
-router.get('/:idNode/parents', validarJwt, async (req, res) => {
+router.get('/:idNode/parents', validarJwt, async(req, res) => {
   try {
     // obtiene la información de los hijos del nodo
     const ticket = req.ticket
@@ -120,7 +134,7 @@ router.get('/:idNode/parents', validarJwt, async (req, res) => {
   }
 })
 
-router.get('/:idNode/content', validarJwt, async (req, res) => {
+router.get('/:idNode/content', validarJwt, async(req, res) => {
   try {
     // obtiene el contenido del nodo => sirve para archivos por ejemplo: pdf
     const ticket = req.ticket
@@ -133,7 +147,7 @@ router.get('/:idNode/content', validarJwt, async (req, res) => {
 })
 
 // PUT
-router.put('/update-permissions/:id', validarJwt, async (req, res) => {
+router.put('/update-permissions/:id', validarJwt, async(req, res) => {
   try {
     const { authorityId, name, accessStatus } = req.body
     const ticket = req.ticket
@@ -144,8 +158,8 @@ router.put('/update-permissions/:id', validarJwt, async (req, res) => {
       nodeData: {
         authorityId,
         name,
-        accessStatus
-      }
+        accessStatus,
+      },
     })
     return res.status(updatedPermissions.status).json(updatedPermissions)
   } catch (error) {
@@ -153,7 +167,7 @@ router.put('/update-permissions/:id', validarJwt, async (req, res) => {
   }
 })
 
-router.put('/revert-permissions/:id', validarJwt, async (req, res) => {
+router.put('/revert-permissions/:id', validarJwt, async(req, res) => {
   try {
     const { authorityId, name, accessStatus } = req.body
     const ticket = req.ticket
@@ -164,8 +178,8 @@ router.put('/revert-permissions/:id', validarJwt, async (req, res) => {
       nodeData: {
         authorityId,
         name,
-        accessStatus
-      }
+        accessStatus,
+      },
     })
     return res.status(updatedPermissions.status).json(updatedPermissions)
   } catch (error) {
@@ -174,7 +188,7 @@ router.put('/revert-permissions/:id', validarJwt, async (req, res) => {
 })
 
 // PUT
-router.put('/update-type/:id', validarJwt, async (req, res) => {
+router.put('/update-type/:id', validarJwt, async(req, res) => {
   try {
     const { typeDocument } = req.body
     const ticket = req.ticket
@@ -183,8 +197,8 @@ router.put('/update-type/:id', validarJwt, async (req, res) => {
       ticket,
       idNode,
       nodeData: {
-        typeDocument
-      }
+        typeDocument,
+      },
     })
     return res.status(updatedTypeNode.status).json(updatedTypeNode)
   } catch (error) {
@@ -193,7 +207,7 @@ router.put('/update-type/:id', validarJwt, async (req, res) => {
 })
 
 // POST
-router.post('/move-node/:id', validarJwt, async (req, res) => {
+router.post('/move-node/:id', validarJwt, async(req, res) => {
   try {
     const { targetId } = req.body
     const ticket = req.ticket
@@ -201,7 +215,7 @@ router.post('/move-node/:id', validarJwt, async (req, res) => {
     const nodeMoved = await moveNode({
       ticket,
       idNode,
-      targetId
+      targetId,
     })
     return res.status(nodeMoved.status).json(nodeMoved)
   } catch (error) {
@@ -209,7 +223,7 @@ router.post('/move-node/:id', validarJwt, async (req, res) => {
   }
 })
 
-router.get('/types', validarJwt, async (req, res) => {
+router.get('/types', validarJwt, async(req, res) => {
   try {
     // obtiene la información de un nodo
     const ticket = req.ticket
