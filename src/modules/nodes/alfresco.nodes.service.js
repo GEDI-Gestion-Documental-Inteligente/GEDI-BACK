@@ -159,7 +159,7 @@ export const uploadAlfrescoContent = async ({
     const URL_HOST = process.env.URL_HOST
     const token = toConvertBase64(ticket)
     // se omiten los campos nombre y nodetype ya que no son necesarios (alfresco detecta que es type content)
-    const { name, title, description, typeDocument } = nodeData
+    const { name, title, description, typeDocument, nodeType } = nodeData
     console.log(nodeData)
 
     // se obtiene el buffer del archivo
@@ -172,10 +172,11 @@ export const uploadAlfrescoContent = async ({
       contentType: file.mimetype // Especifica el tipo de contenido
     })
     formData.append('name', name)
-    if (title && description && typeDocument) {
+    if (title && description && typeDocument && nodeType) {
       formData.append('cm:title', title)
       formData.append('cm:description', description)
       formData.append('cm:type', typeDocument)
+      formData.append('nodeType', nodeType)
     }
 
     const response = await fetch(

@@ -56,7 +56,7 @@ router.post('/:idParent/create-folder', validarJwt, async(req, res) => {
 router.post('/:idParent/upload-content', validarJwt, async(req, res) => {
   try {
     const file = req.file
-    const { name, title, description, typeDocument } = req.body
+    const { name, title, description, typeDocument, nodeType } = req.body
     const ticket = req.ticket
     const idNode = req.params.idParent
     const content = await uploadContent({
@@ -68,7 +68,8 @@ router.post('/:idParent/upload-content', validarJwt, async(req, res) => {
         title,
         description,
         typeDocument,
-      },
+        nodeType
+      }
     })
     return res.status(content.status).json(content)
   } catch (error) {

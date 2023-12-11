@@ -298,7 +298,7 @@ export const revertPermissionsNode = async ({ ticket, idNode, nodeData }) => {
 
 export const uploadContent = async ({ ticket, idNode, nodeData, file }) => {
   try {
-    const { name, title, description, typeDocument } = nodeData
+    const { name, title, description, typeDocument, nodeType } = nodeData
     if (!idNode) {
       return {
         ok: false,
@@ -315,7 +315,8 @@ export const uploadContent = async ({ ticket, idNode, nodeData, file }) => {
         name,
         title,
         description,
-        typeDocument
+        typeDocument,
+        nodeType
       }
     })
     if (alfrescoContent.error) {
