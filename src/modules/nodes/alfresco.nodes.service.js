@@ -172,7 +172,7 @@ export const uploadAlfrescoContent = async ({
       contentType: file.mimetype // Especifica el tipo de contenido
     })
     formData.append('name', name)
-    if (title && description && typeDocument && nodeType) {
+    if (title && description && typeDocument) {
       formData.append('cm:title', title)
       formData.append('cm:description', description)
       formData.append('cm:type', typeDocument)
